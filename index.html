@@ -164,3 +164,167 @@ function withdrawMoney() {
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f2f4ff;
+text-align:center;
+}
+
+header{
+background:#2563eb;
+color:#fff;
+padding:20px;
+box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+.card{
+background:#fff;
+width:90%;
+max-width:450px;
+margin:30px auto;
+padding:20px;
+border-radius:20px;
+box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.balance{
+font-size:55px;
+color:green;
+font-weight:bold;
+margin:20px 0;
+}
+
+button{
+width:100%;
+padding:18px;
+margin:12px 0;
+font-size:28px;
+border:none;
+border-radius:12px;
+background:#2563eb;
+color:#fff;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+.contact{
+margin-top:20px;
+background:#f8f8f8;
+padding:20px;
+border-radius:15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<h3>Earn Money Easily</h3>
+</header>
+
+<div class="card">
+
+<h2>আপনার ব্যালেন্স</h2>
+
+<div class="balance">
+<span id="balance">0</span> টাকা
+</div>
+
+<button onclick="earn()">💰 Earn +10</button>
+
+<button onclick="bonus()">🎁 Daily Bonus +50</button>
+
+<button onclick="withdraw()">💸 Withdraw</button>
+
+<div class="contact">
+<h2>Contact</h2>
+
+<p><b>Bkash / Nagad</b></p>
+
+<h3>01336653636</h3>
+
+<p>support@banglayeasinearn.com</p>
+
+</div>
+
+</div>
+
+<script>
+
+let balance=localStorage.getItem("balance");
+
+if(balance==null){
+balance=0;
+}
+
+document.getElementById("balance").innerHTML=balance;
+
+function earn(){
+
+balance=parseInt(balance)+10;
+
+localStorage.setItem("balance",balance);
+
+document.getElementById("balance").innerHTML=balance;
+
+alert("১০ টাকা যোগ হয়েছে");
+
+}
+
+function bonus(){
+
+let today=new Date().toDateString();
+
+let last=localStorage.getItem("bonus");
+
+if(last==today){
+
+alert("আজকের বোনাস নেওয়া হয়েছে");
+
+return;
+
+}
+
+balance=parseInt(balance)+50;
+
+localStorage.setItem("balance",balance);
+
+localStorage.setItem("bonus",today);
+
+document.getElementById("balance").innerHTML=balance;
+
+alert("৫০ টাকা বোনাস যোগ হয়েছে");
+
+}
+
+function withdraw(){
+
+if(balance<500){
+
+alert("Withdraw করতে কমপক্ষে ৫০০ টাকা লাগবে");
+
+}else{
+
+alert("Withdraw Request সফল হয়েছে");
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
