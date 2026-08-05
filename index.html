@@ -254,3 +254,139 @@ show();
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bangla Yeasin Earn</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f2f5ff;
+}
+
+header{
+background:#1565ff;
+color:#fff;
+padding:25px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+header h1{
+font-size:35px;
+}
+
+header p{
+margin-top:10px;
+font-size:18px;
+}
+
+.container{
+width:95%;
+max-width:500px;
+margin:20px auto;
+}
+
+.card{
+background:#fff;
+padding:20px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.15);
+margin-bottom:20px;
+}
+
+.balance{
+font-size:45px;
+color:green;
+font-weight:bold;
+text-align:center;
+margin:20px 0;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:15px;
+border:none;
+border-radius:12px;
+background:#1565ff;
+color:white;
+font-size:22px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0048d9;
+}
+
+input{
+width:100%;
+padding:15px;
+font-size:18px;
+margin-top:15px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+.refbox{
+background:#f6f6f6;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-top:15px;
+}
+
+.footer{
+text-align:center;
+padding:20px;
+color:#555;
+font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<p>Earn Money Easily</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2 style="text-align:center;">আপনার ব্যালেন্স</h2>
+
+<div class="balance" id="balance">
+0 টাকা
+</div>
+
+<button onclick="earnMoney()">
+💰 Earn +10
+</button>
+
+<button onclick="dailyBonus()">
+🎁 Daily Bonus (+50)
+</button>
+
+<input
+type="number"
+id="number"
+placeholder="bKash / Nagad নম্বর">
+
+<button onclick="withdrawMoney()">
+💳 Withdraw
+</button>
