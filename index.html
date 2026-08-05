@@ -397,7 +397,39 @@ font-size:16px;
 
     <a href="tel:01336653636"
        style="display:inline-block;background:#2563eb;color:#fff;padding:12px 30px;border-radius:10px;text-decoration:none;font-size:18px;">
-       Call Now
-    </a>
-</div>
-<a href="tel:01336653636" class="btn">Call Now</a>
+      <script>
+let balance = Number(localStorage.getItem("balance")) || 0;
+let lastBonus = localStorage.getItem("lastBonus") || "";
+
+const balanceText = document.getElementById("balance");
+
+function updateBalance() {
+    balanceText.innerText = balance + " টাকা";
+    localStorage.setItem("balance", balance);
+}
+
+updateBalance();
+
+function earnMoney() {
+    balance += 10;
+    updateBalance();
+    alert("✅ ১০ টাকা যোগ হয়েছে!");
+}
+
+function dailyBonus() {
+    const today = new Date().toDateString();
+
+    if (lastBonus === today) {
+        alert("❌ আজকের Daily Bonus ইতোমধ্যে নিয়েছেন!");
+        return;
+    }
+
+    balance += 50;
+    lastBonus = today;
+    localStorage.setItem("lastBonus", today);
+    updateBalance();
+
+    alert("🎉 Daily Bonus +৫০ টাকা যোগ হয়েছে!");
+}
+      </script>
+    
