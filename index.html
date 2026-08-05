@@ -489,3 +489,164 @@ Bangla Yeasin Earn
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+}
+
+header{
+background:green;
+color:#fff;
+padding:20px;
+text-align:center;
+font-size:35px;
+font-weight:bold;
+}
+
+.container{
+padding:20px;
+}
+
+.card{
+background:#fff;
+border-radius:15px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.balance{
+background:linear-gradient(45deg,#00b300,#00cc44);
+color:#fff;
+padding:30px;
+border-radius:15px;
+text-align:center;
+font-size:45px;
+font-weight:bold;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+margin-top:20px;
+}
+
+.box{
+background:#fff;
+width:30%;
+padding:15px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.task-btn{
+width:100%;
+padding:15px;
+background:green;
+color:#fff;
+border:none;
+border-radius:10px;
+font-size:22px;
+cursor:pointer;
+}
+
+footer{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#fff;
+display:flex;
+justify-content:space-around;
+padding:12px;
+box-shadow:0 -2px 10px rgba(0,0,0,.2);
+}
+
+footer a{
+text-decoration:none;
+color:green;
+font-size:20px;
+font-weight:bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+Bangla Yeasin Earn
+</header>
+
+<div class="container">
+
+<div class="card">
+<div class="balance">
+৳ <span id="balance">0.00</span>
+</div>
+
+<h2>Wallet Balance</h2>
+
+<div class="stats">
+
+<div class="box">
+<h1 id="task">0</h1>
+<p>Tasks</p>
+</div>
+
+<div class="box">
+<h1>৳<span id="today">0</span></h1>
+<p>Today</p>
+</div>
+
+<div class="box">
+<h1>৳<span id="total">0</span></h1>
+<p>Total</p>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h1>🎬 Video Task</h1>
+<p>Watch 30 Seconds</p>
+<button class="task-btn">Watch Now</button>
+</div>
+
+<div class="card">
+<h1>📢 Ad Task</h1>
+<p>View One Advertisement</p>
+<button class="task-btn">Start Task</button>
+</div>
+
+<div class="card">
+<h1>💸 Withdraw</h1>
+<p>Minimum Withdraw ৳500</p>
+<button class="task-btn">Withdraw</button>
+</div>
+
+</div>
+
+<footer>
+<a href="#">🏠 Home</a>
+<a href="#">🎬 Tasks</a>
+<a href="#">💰 Wallet</a>
+<a href="#">👤 Profile</a>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
