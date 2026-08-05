@@ -432,4 +432,38 @@ function dailyBonus() {
     alert("🎉 Daily Bonus +৫০ টাকা যোগ হয়েছে!");
 }
       </script>
-    
+  <script>
+let balance = localStorage.getItem("balance") || 0;
+let lastBonus = localStorage.getItem("lastBonus") || "";
+
+const balanceEl = document.getElementById("balance");
+balanceEl.innerText = balance + " টাকা";
+
+function saveBalance() {
+  localStorage.setItem("balance", balance);
+  balanceEl.innerText = balance + " টাকা";
+}
+
+function earn() {
+  balance = parseInt(balance) + 10;
+  saveBalance();
+  alert("আপনি ১০ টাকা পেয়েছেন!");
+}
+
+function dailyBonus() {
+  const today = new Date().toLocaleDateString();
+
+  if (lastBonus === today) {
+    alert("আজকের Daily Bonus ইতোমধ্যে নেওয়া হয়েছে!");
+    return;
+  }
+
+  balance = parseInt(balance) + 50;
+  lastBonus = today;
+
+  localStorage.setItem("lastBonus", today);
+  saveBalance();
+
+  alert("অভিনন্দন! আপনি ৫০ টাকা Daily Bonus পেয়েছেন।");
+}
+  </script>  
