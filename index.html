@@ -328,3 +328,314 @@ alert("Withdraw Request সফল হয়েছে");
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#eef2ff;
+}
+
+header{
+background:#2563eb;
+color:#fff;
+text-align:center;
+padding:25px;
+box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+
+header h1{
+font-size:42px;
+}
+
+header p{
+font-size:22px;
+margin-top:5px;
+}
+
+.container{
+width:92%;
+max-width:500px;
+margin:30px auto;
+background:#fff;
+padding:25px;
+border-radius:20px;
+box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.balance-title{
+font-size:24px;
+font-weight:bold;
+text-align:center;
+}
+
+.balance{
+font-size:60px;
+font-weight:bold;
+color:green;
+text-align:center;
+margin:25px 0;
+}
+
+.btn{
+display:block;
+width:100%;
+padding:18px;
+margin:15px 0;
+font-size:28px;
+border:none;
+border-radius:15px;
+background:#2563eb;
+color:#fff;
+cursor:pointer;
+transition:.3s;
+}
+
+.btn:hover{
+background:#1d4ed8;
+}
+
+.contact{
+margin-top:30px;
+background:#f5f5f5;
+padding:20px;
+border-radius:15px;
+text-align:center;
+}
+
+.contact h2{
+margin-bottom:15px;
+}
+
+.contact p{
+font-size:20px;
+margin:8px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<p>Earn Money Easily</p>
+</header>
+
+<div class="container">
+
+<h2 class="balance-title">আপনার ব্যালেন্স</h2>
+
+<div class="balance">
+<span id="balance">0</span> টাকা
+</div>
+
+<button class="btn" onclick="earn()">💰 Earn +10</button>
+
+<button class="btn" onclick="dailyBonus()">🎁 Daily Bonus +50</button>
+
+<button class="btn" onclick="withdraw()">💸 Withdraw</button>
+
+<div class="contact">
+<h2>Contact</h2>
+<p><b>Bkash / Nagad</b></p>
+<p>01336653636</p>
+<p>support@banglayeasinearn.com</p>
+</div>
+
+</div><script>
+
+let balance = localStorage.getItem("balance");
+
+if (balance == null) {
+    balance = 0;
+}
+
+document.getElementById("balance").innerHTML = balance;
+
+function updateBalance() {
+    document.getElementById("balance").innerHTML = balance;
+    localStorage.setItem("balance", balance);
+}
+
+function earn() {
+    balance = parseInt(balance) + 10;
+    updateBalance();
+    alert("✅ ১০ টাকা যোগ হয়েছে!");
+}
+
+function dailyBonus() {
+
+    let today = new Date().toDateString();
+    let lastBonus = localStorage.getItem("lastBonus");
+
+    if (lastBonus === today) {
+        alert("🎁 আজকের বোনাস ইতোমধ্যে নেওয়া হয়েছে।");
+        return;
+    }
+
+    balance = parseInt(balance) + 50;
+
+    localStorage.setItem("lastBonus", today);
+
+    updateBalance();
+
+    alert("🎉 ৫০ টাকা Daily Bonus যোগ হয়েছে!");
+}
+
+function withdraw() {
+
+    if (balance < 500) {
+        alert("❌ Withdraw করতে কমপক্ষে ৫০০ টাকা লাগবে।");
+        return;
+    }
+
+    let number = prompt("আপনার বিকাশ / নগদ নম্বর লিখুন");
+
+    if (number == "" || number == null) {
+        return;
+    }
+
+    balance = balance - 500;
+
+    updateBalance();
+
+    alert("✅ Withdraw Request সফল হয়েছে!");
+}
+
+</script> <!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#eef2ff;
+}
+
+header{
+background:#2563eb;
+color:#fff;
+text-align:center;
+padding:25px;
+box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+
+header h1{
+font-size:42px;
+}
+
+header p{
+font-size:22px;
+margin-top:5px;
+}
+
+.container{
+width:92%;
+max-width:500px;
+margin:30px auto;
+background:#fff;
+padding:25px;
+border-radius:20px;
+box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.balance-title{
+font-size:24px;
+font-weight:bold;
+text-align:center;
+}
+
+.balance{
+font-size:60px;
+font-weight:bold;
+color:green;
+text-align:center;
+margin:25px 0;
+}
+
+.btn{
+display:block;
+width:100%;
+padding:18px;
+margin:15px 0;
+font-size:28px;
+border:none;
+border-radius:15px;
+background:#2563eb;
+color:#fff;
+cursor:pointer;
+transition:.3s;
+}
+
+.btn:hover{
+background:#1d4ed8;
+}
+
+.contact{
+margin-top:30px;
+background:#f5f5f5;
+padding:20px;
+border-radius:15px;
+text-align:center;
+}
+
+.contact h2{
+margin-bottom:15px;
+}
+
+.contact p{
+font-size:20px;
+margin:8px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<p>Earn Money Easily</p>
+</header>
+
+<div class="container">
+
+<h2 class="balance-title">আপনার ব্যালেন্স</h2>
+
+<div class="balance">
+<span id="balance">0</span> টাকা
+</div>
+
+<button class="btn" onclick="earn()">💰 Earn +10</button>
+
+<button class="btn" onclick="dailyBonus()">🎁 Daily Bonus +50</button>
+
+<button class="btn" onclick="withdraw()">💸 Withdraw</button>
+
+<div class="contact">
+<h2>Contact</h2>
+<p><b>Bkash / Nagad</b></p>
+<p>01336653636</p>
+<p>support@banglayeasinearn.com</p>
+</div>
+
+</div>
