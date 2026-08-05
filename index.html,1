@@ -1,1 +1,166 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
 
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f2f5ff;
+}
+
+header{
+background:#1565ff;
+color:#fff;
+text-align:center;
+padding:25px;
+box-shadow:0 5px 10px rgba(0,0,0,.2);
+}
+
+.container{
+max-width:450px;
+margin:20px auto;
+padding:15px;
+}
+
+.card{
+background:#fff;
+padding:20px;
+border-radius:18px;
+box-shadow:0 5px 20px rgba(0,0,0,.15);
+text-align:center;
+}
+
+.balance{
+font-size:48px;
+font-weight:bold;
+color:green;
+margin:20px 0;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:15px;
+border:none;
+border-radius:12px;
+background:#1565ff;
+color:#fff;
+font-size:20px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0d47a1;
+}
+
+.contact{
+margin-top:25px;
+padding:20px;
+background:#fafafa;
+border-radius:15px;
+}
+
+.contact h2{
+margin-bottom:10px;
+}
+
+.footer{
+margin-top:25px;
+text-align:center;
+color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<p>Earn Money Easily</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>আপনার ব্যালেন্স</h2>
+
+<div id="balance" class="balance">0 টাকা</div>
+
+<button onclick="earnMoney()">💰 Earn +10</button>
+
+<button onclick="dailyBonus()">🎁 Daily Bonus (+50)</button>
+
+<button onclick="withdrawMoney()">💸 Withdraw</button>
+
+<div class="contact">
+<h2>Contact</h2>
+<p><b>Bkash / Nagad</b></p>
+<p>01336653636</p>
+<p>support@banglayeasinearn.com</p>
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 Bangla Yeasin Earn
+</div>
+
+<script>
+let balance = parseInt(localStorage.getItem("balance")) || 0;
+let lastBonus = localStorage.getItem("lastBonus") || "";
+
+const balanceEl = document.getElementById("balance");
+
+function updateBalance() {
+  balanceEl.innerText = balance + " টাকা";
+  localStorage.setItem("balance", balance);
+}
+
+updateBalance();
+
+function earnMoney() {
+  balance += 10;
+  updateBalance();
+  alert("✅ আপনি ১০ টাকা পেয়েছেন!");
+}
+
+function dailyBonus() {
+  const today = new Date().toDateString();
+
+  if (lastBonus === today) {
+    alert("❌ আজকের Daily Bonus ইতোমধ্যে নেওয়া হয়েছে!");
+    return;
+  }
+
+  balance += 50;
+  lastBonus = today;
+
+  localStorage.setItem("lastBonus", today);
+  updateBalance();
+
+  alert("🎉 আপনি ৫০ টাকা Daily Bonus পেয়েছেন!");
+}
+
+function withdrawMoney() {
+  if (balance < 100) {
+    alert("❌ Withdraw করতে কমপক্ষে ১০০ টাকা লাগবে!");
+    return;
+  }
+
+  alert("✅ Withdraw Request সফল!");
+  balance = 0;
+  updateBalance();
+}</script>
+
+</body>
+</html>
