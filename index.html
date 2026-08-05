@@ -111,3 +111,126 @@ Bangla Yeasin Earn
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f2f2f2;
+}
+
+header{
+background:green;
+color:white;
+text-align:center;
+padding:20px;
+font-size:35px;
+font-weight:bold;
+}
+
+.card{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:15px;
+box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+.balance{
+text-align:center;
+color:green;
+font-size:50px;
+font-weight:bold;
+}
+
+.subtitle{
+text-align:center;
+font-size:28px;
+}
+
+h2{
+margin:0 0 10px;
+}
+
+button{
+width:100%;
+padding:15px;
+font-size:24px;
+background:green;
+color:white;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+button:hover{
+background:#006600;
+}
+</style>
+
+</head>
+<body>
+
+<header>Bangla Yeasin Earn</header>
+
+<div class="card">
+<div class="balance">৳ <span id="money">0.00</span></div>
+<div class="subtitle">Wallet Balance</div>
+</div>
+
+<div class="card">
+<h2>🎥 Video Task</h2>
+<p>Watch 30 Seconds</p>
+<button onclick="videoTask()">Watch Now</button>
+</div>
+
+<div class="card">
+<h2>📢 Ad Task</h2>
+<p>View One Advertisement</p>
+<button onclick="adTask()">Start Task</button>
+</div>
+
+<div class="card">
+<h2>💰 Withdraw</h2>
+<p>Minimum Withdraw ৳500</p>
+<button onclick="withdraw()">Withdraw</button>
+</div>
+
+<script>
+let balance=0;
+
+function update(){
+document.getElementById("money").innerHTML=balance.toFixed(2);
+}
+
+function videoTask(){
+alert("Watch completed! +৳5");
+balance+=5;
+update();
+}
+
+function adTask(){
+alert("Advertisement completed! +৳2");
+balance+=2;
+update();
+}
+
+function withdraw(){
+if(balance>=500){
+alert("Withdraw Request Sent!");
+balance=0;
+update();
+}else{
+alert("Minimum Withdraw ৳500");
+}
+}
+</script>
+
+</body>
+</html>
