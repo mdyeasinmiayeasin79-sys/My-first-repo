@@ -1,1 +1,86 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+}
+header{
+    background:#0d6efd;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+}
+.container{
+    max-width:400px;
+    margin:20px auto;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+    text-align:center;
+}
+.balance{
+    font-size:28px;
+    color:green;
+    margin:15px 0;
+}
+button{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:8px;
+    background:#0d6efd;
+    color:white;
+    font-size:18px;
+}
+button:hover{
+    background:#084298;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Bangla Yeasin Earn</h1>
+<p>Welcome</p>
+</header>
+
+<div class="container">
+<h2>আপনার ব্যালেন্স</h2>
+<div class="balance" id="balance">0 টাকা</div>
+
+<button onclick="earn()">Earn +10</button>
+<button onclick="withdraw()">Withdraw</button>
+</div>
+
+<script>
+let balance=0;
+
+function earn(){
+    balance+=10;
+    document.getElementById("balance").innerHTML=balance+" টাকা";
+}
+
+function withdraw(){
+    if(balance>=100){
+        alert("Withdraw Request সফল!");
+        balance=0;
+        document.getElementById("balance").innerHTML="0 টাকা";
+    }else{
+        alert("Withdraw করতে কমপক্ষে 100 টাকা লাগবে।");
+    }
+}
+</script>
+
+</body>
+</html>
