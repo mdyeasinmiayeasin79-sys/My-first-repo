@@ -650,3 +650,52 @@ Bangla Yeasin Earn
 
 </body>
 </html>
+let balance = 0;
+let tasks = 0;
+let today = 0;
+let total = 0;
+
+const balanceEl = document.getElementById("balance");
+const taskEl = document.getElementById("task");
+const todayEl = document.getElementById("today");
+const totalEl = document.getElementById("total");
+
+function updateUI() {
+  balanceEl.innerText = balance.toFixed(2);
+  taskEl.innerText = tasks;
+  todayEl.innerText = today;
+  totalEl.innerText = total;
+}
+
+const buttons = document.querySelectorAll(".task-btn");
+
+buttons[0].onclick = function () {
+  alert("ভিডিও দেখুন ৩০ সেকেন্ড...");
+  setTimeout(() => {
+    balance += 5;
+    today += 5;
+    total += 5;
+    tasks++;
+    updateUI();
+    alert("আপনি ৳5 পেয়েছেন");
+  }, 30000);
+};
+
+buttons[1].onclick = function () {
+  balance += 2;
+  today += 2;
+  total += 2;
+  tasks++;
+  updateUI();
+  alert("Ad Task Complete! ৳2 যোগ হয়েছে");
+};
+
+buttons[2].onclick = function () {
+  if (balance >= 500) {
+    alert("Withdraw Request Submitted");
+  } else {
+    alert("Minimum Withdraw ৳500");
+  }
+};
+
+updateUI();
