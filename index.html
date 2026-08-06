@@ -2032,3 +2032,1132 @@ await deferredPrompt.userChoice;
 deferredPrompt = null;
 
 };
+import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function checkVersion(){
+
+const snap =
+await getDoc(doc(db,"settings","app"));
+
+if(!snap.exists()) return;
+
+const latest = snap.data().version;
+
+const current = "1.0.0";
+
+if(latest !== current){
+
+alert("🚀 নতুন ভার্সন পাওয়া গেছে। আপডেট করুন।");
+
+}
+
+}
+
+checkVersion();
+<div class="card">
+<h2>📈 Analytics</h2>
+
+<p>আজকের নতুন User: <span id="todayUsers">0</span></p>
+
+<p>আজকের Withdraw: <span id="todayWithdraw">0</span></p>
+
+<p>আজকের Income: <span id="todayIncome">0</span></p>
+
+</div>
+
+<div class="card">
+<h2>🛠️ Maintenance Mode</h2>
+
+<button onclick="enableMaintenance()">
+Enable
+</button>
+
+<button onclick="disableMaintenance()">
+Disable
+</button>
+
+</div>
+
+<div class="card">
+<h2>📋 User Activity</h2>
+
+<div id="activityLog"></div>
+
+</div>
+import {
+doc,
+updateDoc,
+collection,
+getDocs,
+serverTimestamp,
+addDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Maintenance ON
+window.enableMaintenance = async () => {
+
+await updateDoc(doc(db,"settings","app"),{
+
+maintenance:true
+
+});
+
+alert("Maintenance Mode Enabled");
+
+};
+
+// Maintenance OFF
+window.disableMaintenance = async () => {
+
+await updateDoc(doc(db,"settings","app"),{
+
+maintenance:false
+
+});
+
+alert("Maintenance Mode Disabled");
+
+};
+
+// Activity Log
+window.saveActivity = async (action) => {
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await addDoc(collection(db,"activityLogs"),{
+
+uid:user.uid,
+
+email:user.email,
+
+action:action,
+
+time:serverTimestamp()
+
+});
+
+};
+
+// Load Activity
+async function loadActivity(){
+
+const snapshot =
+await getDocs(collection(db,"activityLogs"));
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+<b>${d.email}</b><br>
+${d.action}
+</div>
+`;
+
+});
+
+document.getElementById("activityLog").innerHTML=html;
+
+}
+
+loadActivity();
+import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function checkMaintenance(){
+
+const snap =
+await getDoc(doc(db,"settings","app"));
+
+if(!snap.exists()) return;
+
+if(snap.data().maintenance){
+
+document.body.innerHTML = `
+<h1 style="text-align:center;margin-top:100px;">
+🚧 Website Under Maintenance
+</h1>
+`;
+
+}
+
+}
+
+checkMaintenance();
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+  increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Spin
+window.spinWheel = async () => {
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  const data = snap.data();
+
+  const today = new Date().toDateString();
+
+  if (data.lastSpin === today) {
+    alert("❌ আজকে আপনি ইতিমধ্যে Spin করেছেন।");
+    return;
+  }
+
+  const prizes = [2, 5, 10, 20];
+  const reward = prizes[Math.floor(Math.random() * prizes.length)];
+
+  await updateDoc(ref, {
+    balance: increment(reward),
+    lastSpin: today,
+    updatedAt: serverTimestamp()
+  });
+
+  alert(`🎉 আপনি ${reward} টাকা জিতেছেন!`);
+};
+window.completeTask = async () => {
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  const data = snap.data();
+
+  const today = new Date().toDateString();
+
+  if (data.lastTask === today) {
+    alert("❌ আজকের Task ইতিমধ্যে সম্পন্ন হয়েছে।");
+    return;
+  }
+
+  await updateDoc(ref, {
+    balance: increment(3),
+    lastTask: today,
+    updatedAt: serverTimestamp()
+  });
+
+  alert("✅ Task Reward যোগ হয়েছে।");
+};
+users
+ ├── uid
+ │    ├── balance
+ │    ├── lastSpin
+ │    ├── lastTask
+ │    ├── lastDailyBonus
+ │    ├── vip
+ │    ├── blocked
+ │    ├── photoURL
+ │    └── referralCode
+ import {
+  getAuth,
+  sendEmailVerification,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const auth = getAuth();
+
+// Email Verification
+window.verifyEmail = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("প্রথমে Login করুন");
+        return;
+    }
+
+    await sendEmailVerification(user);
+
+    alert("✅ Verification Email পাঠানো হয়েছে");
+};
+
+// Password Reset
+window.resetPassword = async () => {
+
+    const email = prompt("আপনার Email লিখুন");
+
+    if (!email) return;
+
+    await sendPasswordResetEmail(auth, email);
+
+    alert("✅ Password Reset Email পাঠানো হয়েছে");
+
+};
+<div class="card">
+<h3>🔐 Account Security</h3>
+
+<button onclick="verifyEmail()">
+Verify Email
+</button>
+
+<button onclick="resetPassword()">
+Reset Password
+</button>
+
+</div>
+import {
+signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+window.login = async () => {
+
+const email =
+document.getElementById("email").value;
+
+const password =
+document.getElementById("password").value;
+
+const result =
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+if(!result.user.emailVerified){
+
+alert("❌ আগে Email Verify করুন");
+
+await auth.signOut();
+
+return;
+
+}
+
+location.href="index.html";
+
+};
+<div class="card">
+<h3>🔢 Withdraw PIN</h3>
+
+<input
+type="password"
+id="withdrawPin"
+maxlength="6"
+placeholder="৬ সংখ্যার PIN">
+
+<button onclick="savePin()">
+Save PIN
+</button>
+
+</div>
+window.savePin = async () => {
+
+const pin =
+document.getElementById("withdrawPin").value;
+
+if(pin.length !== 6){
+
+alert("PIN অবশ্যই ৬ সংখ্যার হতে হবে");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+withdrawPin: pin
+});
+
+alert("PIN Saved");
+
+};
+<div class="card">
+    <h3>🪪 KYC Verification</h3>
+
+    <input type="text" id="fullName" placeholder="Full Name">
+
+    <input type="text" id="nidNumber" placeholder="NID Number">
+
+    <input type="file" id="nidFront" accept="image/*">
+
+    <input type="file" id="nidBack" accept="image/*">
+
+    <button onclick="submitKYC()">
+        Submit KYC
+    </button>
+</div>
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.submitKYC = async () => {
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const name = document.getElementById("fullName").value;
+  const nid = document.getElementById("nidNumber").value;
+
+  await addDoc(collection(db, "kyc"), {
+    uid: user.uid,
+    name: name,
+    nid: nid,
+    status: "Pending",
+    createdAt: serverTimestamp()
+  });
+
+  alert("✅ KYC Request Submitted");
+};
+async function approveKYC(id){
+
+    await updateDoc(doc(db,"kyc",id),{
+
+        status:"Approved"
+
+    });
+
+}
+
+async function rejectKYC(id){
+
+    await updateDoc(doc(db,"kyc",id),{
+
+        status:"Rejected"
+
+    });
+
+}
+<div class="card">
+    <h3>💬 Live Support</h3>
+
+    <div id="chatBox" style="height:300px;overflow:auto;border:1px solid #ddd;padding:10px;"></div>
+
+    <input
+        type="text"
+        id="chatMessage"
+        placeholder="আপনার মেসেজ লিখুন">
+
+    <button onclick="sendMessage()">
+        Send
+    </button>
+</div>
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Send Message
+window.sendMessage = async () => {
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const message =
+    document.getElementById("chatMessage").value;
+
+    if(message.trim()=="") return;
+
+    await addDoc(collection(db,"supportChats"),{
+
+        uid:user.uid,
+        email:user.email,
+        sender:"user",
+        message:message,
+        createdAt:serverTimestamp()
+
+    });
+
+    document.getElementById("chatMessage").value="";
+
+};
+
+// Real-time Chat
+const q=query(
+collection(db,"supportChats"),
+orderBy("createdAt")
+);
+
+onSnapshot(q,(snapshot)=>{
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div>
+<b>${d.sender}:</b> ${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("chatBox").innerHTML=html;
+
+});
+window.replySupport = async(uid,message)=>{
+
+await addDoc(collection(db,"supportChats"),{
+
+uid:uid,
+
+sender:"admin",
+
+message:message,
+
+createdAt:serverTimestamp()
+
+});
+
+};supportChats
+   ├── message
+   ├── sender
+   ├── uid
+   ├── email
+   ├── createdAt
+   <div class="card">
+    <h3>🔗 My Referral Link</h3>
+
+    <input type="text" id="referralLink" readonly>
+
+    <button onclick="copyReferralLink()">
+        Copy Link
+    </button>
+</div>
+
+<div class="card">
+    <h3>🏆 Daily Top Earners</h3>
+
+    <div id="dailyLeaderboard"></div>
+</div>
+
+<div class="card">
+    <h3>🔔 Push Notification</h3>
+
+    <button onclick="subscribeNotification()">
+        Enable Notification
+    </button>
+</div>
+import {
+collection,
+query,
+orderBy,
+limit,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Referral Link
+window.loadReferralLink = () => {
+
+const uid = auth.currentUser.uid;
+
+document.getElementById("referralLink").value =
+location.origin + "/register.html?ref=" + uid;
+
+};
+
+// Copy Link
+window.copyReferralLink = () => {
+
+const input =
+document.getElementById("referralLink");
+
+input.select();
+
+document.execCommand("copy");
+
+alert("Referral Link Copied");
+
+};
+
+// Daily Leaderboard
+async function loadDailyLeaderboard(){
+
+const q = query(
+
+collection(db,"users"),
+
+orderBy("todayIncome","desc"),
+
+limit(10)
+
+);
+
+const snapshot = await getDocs(q);
+
+let html="";
+
+let i=1;
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<p>${i}. ${d.name} - ${d.todayIncome} টাকা</p>
+`;
+
+i++;
+
+});
+
+document.getElementById("dailyLeaderboard").innerHTML=html;
+
+}
+
+loadReferralLink();
+
+loadDailyLeaderboard();
+window.subscribeNotification = async ()=>{
+
+if(Notification.permission!=="granted"){
+
+await Notification.requestPermission();
+
+}
+
+if(Notification.permission==="granted"){
+
+new Notification("Bangla Yeasin Earn",{
+
+body:"Notification চালু হয়েছে"
+
+});
+
+}
+
+};
+<div class="card">
+<h3>👤 Edit Profile</h3>
+
+<input type="text" id="editName" placeholder="আপনার নাম">
+
+<input type="text" id="editPhone" placeholder="মোবাইল নম্বর">
+
+<button onclick="saveProfile()">
+Save Profile
+</button>
+</div>
+
+<div class="card">
+<h3>🟢 Online Status</h3>
+
+<p id="onlineStatus">Offline</p>
+</div>
+
+<div class="card">
+<h3>📄 Export Transactions</h3>
+
+<button onclick="exportTransactions()">
+Download CSV
+</button>
+</div>
+import {
+doc,
+updateDoc,
+collection,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Profile
+window.saveProfile = async () => {
+
+const user = auth.currentUser;
+if(!user) return;
+
+const name = document.getElementById("editName").value;
+const phone = document.getElementById("editPhone").value;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+name:name,
+phone:phone,
+updatedAt:serverTimestamp()
+
+});
+
+alert("✅ Profile Updated");
+
+};
+
+// Online Status
+window.addEventListener("load", async()=>{
+
+const user=auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+online:true,
+lastSeen:serverTimestamp()
+
+});
+
+document.getElementById("onlineStatus").innerHTML="🟢 Online";
+
+});
+
+window.addEventListener("beforeunload", async()=>{
+
+const user=auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+online:false,
+lastSeen:serverTimestamp()
+
+});
+
+window.exportTransactions = async()=>{
+
+const user = auth.currentUser;
+if(!user) return;
+
+const snapshot = await getDocs(
+collection(db,"users",user.uid,"transactions")
+);
+
+let csv = "Type,Amount,Date\n";
+
+snapshot.forEach(doc=>{
+
+const d = doc.data();
+
+csv += `${d.type},${d.amount},${d.date || ""}\n`;
+
+});
+
+const blob = new Blob([csv],{type:"text/csv"});
+
+const a = document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download = "transactions.csv";
+
+a.click();
+
+};
+<div class="card">
+    <h3>🏅 My Badge</h3>
+    <p id="userBadge">Loading...</p>
+</div>
+
+<div class="card">
+    <h3>📈 My Rank</h3>
+    <p id="userRank">Loading...</p>
+</div>
+
+<div class="card">
+    <h3>🗑️ Account</h3>
+    <button onclick="deleteMyAccount()">
+        Delete Account
+    </button>
+</div
+    import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  deleteDoc,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  deleteUser
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+// Badge
+async function loadBadge(){
+
+const user = auth.currentUser;
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+const data = snap.data();
+
+let badge = "🥉 Beginner";
+
+if(data.balance >= 500)
+badge = "🥈 Silver";
+
+if(data.balance >= 1000)
+badge = "🥇 Gold";
+
+if(data.balance >= 5000)
+badge = "💎 Diamond";
+
+document.getElementById("userBadge").innerHTML = badge;
+
+}
+
+// Rank
+async function loadRank(){
+
+const user = auth.currentUser;
+if(!user) return;
+
+const q = query(
+collection(db,"users"),
+orderBy("balance","desc")
+);
+
+const snapshot = await getDocs(q);
+
+let rank = 1;
+
+snapshot.forEach(doc=>{
+
+if(doc.id === user.uid){
+
+document.getElementById("userRank").innerHTML =
+"#"+rank;
+
+}
+
+rank++;
+
+});
+
+}
+
+// Delete Account
+window.deleteMyAccount = async()=>{
+
+const ok = confirm(
+"আপনি কি নিশ্চিত?"
+);
+
+if(!ok) return;
+
+const user = auth.currentUser;
+
+await deleteDoc(doc(db,"users",user.uid));
+
+await deleteUser(user);
+
+alert("অ্যাকাউন্ট সফলভাবে মুছে ফেলা হয়েছে");
+
+location.href="login.html";
+
+};
+
+loadBadge();
+loadRank();
+<div class="card">
+<h3>🔍 User Search</h3>
+
+<input
+type="text"
+id="searchEmail"
+placeholder="User Email">
+
+<button onclick="searchUser()">
+Search
+</button>
+
+<div id="searchResult"></div>
+
+</div>
+
+<div class="card">
+<h3>🚫 Ban / Unban User</h3>
+
+<button onclick="banUser()">
+Ban
+</button>
+
+<button onclick="unbanUser()">
+Unban
+</button>
+
+</div>
+
+<div class="card">
+<h3>🕒 Login History</h3>
+
+<div id="loginHistory"></div>
+
+</div>
+import {
+collection,
+query,
+where,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+let selectedUID = "";
+
+// Search User
+window.searchUser = async () => {
+
+const email =
+document.getElementById("searchEmail").value;
+
+const q = query(
+collection(db,"users"),
+where("email","==",email)
+);
+
+const snapshot = await getDocs(q);
+
+snapshot.forEach(user=>{
+
+selectedUID = user.id;
+
+const d = user.data();
+
+document.getElementById("searchResult").innerHTML = `
+<p>Name: ${d.name}</p>
+<p>Email: ${d.email}</p>
+<p>Balance: ${d.balance}</p>
+<p>Status: ${d.blocked ? "🚫 Blocked" : "✅ Active"}</p>
+`;
+
+});
+
+};
+
+// Ban User
+window.banUser = async()=>{
+
+if(!selectedUID) return;
+
+await updateDoc(
+doc(db,"users",selectedUID),
+{
+blocked:true
+});
+
+alert("User Banned");
+
+};
+
+// Unban User
+window.unbanUser = async()=>{
+
+if(!selectedUID) return;
+
+await updateDoc(
+doc(db,"users",selectedUID),
+{
+blocked:false
+});
+
+alert("User Unbanned");
+
+};
+import {
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function saveLoginHistory(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await addDoc(
+collection(db,"loginHistory"),
+{
+
+uid:user.uid,
+
+email:user.email,
+
+loginTime:serverTimestamp()
+
+});
+
+}await saveLoginHistory();
+});
+<div class="card">
+<h3>⚙️ App Settings</h3>
+
+<input
+type="text"
+id="appName"
+placeholder="App Name">
+
+<input
+type="number"
+id="minWithdraw"
+placeholder="Minimum Withdraw">
+
+<button onclick="saveSettings()">
+Save Settings
+</button>
+</div>
+
+<div class="card">
+<h3>📢 Announcement</h3>
+
+<textarea
+id="announcement"
+placeholder="Write Announcement"></textarea>
+
+<button onclick="publishAnnouncement()">
+Publish
+</button>
+</div>
+
+<div class="card">
+<h3>💾 Backup</h3>
+
+<button onclick="backupUsers()">
+Download Users Backup
+</button>
+</div
+
+    import {
+doc,
+setDoc,
+getDocs,
+collection
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Settings
+window.saveSettings = async () => {
+
+const appName =
+document.getElementById("appName").value;
+
+const minWithdraw =
+Number(document.getElementById("minWithdraw").value);
+
+await setDoc(
+doc(db,"settings","app"),
+{
+appName,
+minWithdraw
+},
+{merge:true}
+);
+
+alert("Settings Saved");
+
+};
+
+// Publish Announcement
+window.publishAnnouncement = async()=>{
+
+const text =
+document.getElementById("announcement").value;
+
+await setDoc(
+doc(db,"settings","announcement"),
+{
+message:text,
+updatedAt:new Date()
+}
+);
+
+alert("Announcement Published");
+
+};
+
+// Backup Users
+window.backupUsers = async()=>{
+
+const snapshot =
+await getDocs(collection(db,"users"));
+
+const users=[];
+
+snapshot.forEach(doc=>{
+
+users.push({
+id:doc.id,
+...doc.data()
+});
+
+});
+
+const blob =
+new Blob(
+[
+JSON.stringify(users,null,2)
+],
+{
+type:"application/json"
+}
+);
+
+const a =
+document.createElement("a");
+
+a.href =
+URL.createObjectURL(blob);
+
+a.download =
+"users-backup.json";
+
+a.click();
+
+};
+import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load App Settings
+async function loadAppSettings(){
+
+const snap =
+await getDoc(doc(db,"settings","app"));
+
+if(snap.exists()){
+
+const data = snap.data();
+
+document.title = data.appName || "Bangla Yeasin Earn";
+
+window.MIN_WITHDRAW =
+data.minWithdraw || 100;
+
+}
+
+}
+
+// Load Announcement
+async function loadAnnouncement(){
+
+const snap =
+await getDoc(
+doc(db,"settings","announcement")
+);
+
+if(snap.exists()){
+
+alert(snap.data().message);
+
+}
+
+}
+
+loadAppSettings();
+loadAnnouncement();
