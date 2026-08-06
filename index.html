@@ -374,3 +374,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const app = initializeApp(firebaseConfig);
   </script>
+<button onclick="withdrawMoney()" class="btn">
+💸 Withdraw
+</button>
+
+<script>
+function withdrawMoney() {
+    let balance = parseInt(localStorage.getItem("balance")) || 0;
+
+    if (balance < 500) {
+        alert("❌ Withdraw করতে কমপক্ষে 500 টাকা লাগবে।");
+        return;
+    }
+
+    let number = prompt("বিকাশ/নগদ নম্বর লিখুন:");
+
+    if (!number) return;
+
+    alert("✅ আপনার Withdraw Request গ্রহণ করা হয়েছে।");
+}
+</script>
