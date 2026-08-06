@@ -394,3 +394,1641 @@ function withdrawMoney() {
     alert("✅ আপনার Withdraw Request গ্রহণ করা হয়েছে।");
 }
 </script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangla Yeasin Earn - Admin</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+}
+
+header{
+    background:#0d6efd;
+    color:white;
+    text-align:center;
+    padding:15px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.container{
+    width:95%;
+    max-width:900px;
+    margin:20px auto;
+}
+
+.card{
+    background:#fff;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.card p{
+    margin:6px 0;
+}
+
+.pending{
+    color:orange;
+    font-weight:bold;
+}
+
+.approved{
+    color:green;
+    font-weight:bold;
+}
+
+.rejected{
+    color:red;
+    font-weight:bold;
+}
+
+button{
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    color:#fff;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+.approve{
+    background:green;
+}
+
+.reject{
+    background:red;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+Bangla Yeasin Earn Admin Panel
+</header>
+
+<div class="container">
+    <div id="requests">
+        Loading...
+    </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// আপনার Firebase Config এখানে বসান
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const requestsDiv = document.getElementById("requests");
+
+async function loadRequests() {
+  requestsDiv.innerHTML = "";
+
+  const snapshot = await getDocs(collection(db, "withdraws"));
+
+  snapshot.forEach((item) => {
+    const data = item.data();
+
+    requestsDiv.innerHTML += `
+      <div class="card">
+        <p><b>Method:</b> ${data.method}</p>
+        <p><b>Number:</b> ${data.number}</p>
+        <p><b>Amount:</b> ${data.amount} টাকা</p>
+        <p><b>Status:</b> <span class="${data.status.toLowerCase()}">${data.status}</span></p>
+
+        <button class="approve" onclick="approveRequest('${item.id}')">
+          Approve
+        </button>
+
+        <button class="reject" onclick="rejectRequest('${item.id}')">
+          Reject
+        </button>
+      </div>
+    `;
+  });
+}
+
+window.approveRequest = async (id) => {
+  await updateDoc(doc(db, "withdraws", id), {
+    status: "Approved"
+  });
+
+  alert("Approved Successfully");
+  loadRequests();
+};
+
+window.rejectRequest = async (id) => {
+  await updateDoc(doc(db, "withdraws", id), {
+    status: "Rejected"
+  });
+
+  alert("Rejected Successfully");
+  loadRequests();
+};
+
+loadRequests();
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Login</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+}
+.box{
+    width:320px;
+    margin:80px auto;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px #ccc;
+}
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    box-sizing:border-box;
+}
+button{
+    width:100%;
+    padding:10px;
+    background:#0d6efd;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+<h2>Admin Login</h2>
+
+<input type="text" id="username" placeholder="Username">
+
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+</div>
+
+<script>
+function login(){
+
+const username=document.getElementById("username").value;
+const password=document.getElementById("password").value;
+
+// নিজের তথ্য দিন
+if(username==="admin" && password==="123456"){
+    localStorage.setItem("admin","true");
+    location.href="admin.html";
+}else{
+    alert("ভুল Username অথবা Password");
+}
+
+}
+</script>
+
+</body>
+</html>
+<script>
+if(localStorage.getItem("admin")!=="true"){
+    location.href="login.html";
+}
+</script>
+<button onclick="logout()">Logout</button>
+
+<script>
+function logout(){
+    localStorage.removeItem("admin");
+    location.href="login.html";
+}
+</script>
+<div class="container">
+
+<input
+id="search"
+type="text"
+placeholder="মোবাইল নম্বর দিয়ে খুঁজুন..."
+onkeyup="searchRequest()"
+style="width:100%;padding:10px;margin-bottom:15px;">
+
+<div class="card">
+<h3>Dashboard</h3>
+
+<p>মোট Request: <span id="totalRequest">0</span></p>
+<p>Pending: <span id="pendingCount">0</span></p>
+<p>Approved: <span id="approvedCount">0</span></p>
+<p>Rejected: <span id="rejectedCount">0</span></p>
+
+</div>
+
+</div>
+function updateDashboard() {
+
+const cards = document.querySelectorAll(".card");
+
+let pending = 0;
+let approved = 0;
+let rejected = 0;
+
+cards.forEach(card => {
+
+const text = card.innerText;
+
+if(text.includes("Pending")) pending++;
+if(text.includes("Approved")) approved++;
+if(text.includes("Rejected")) rejected++;
+
+});
+
+document.getElementById("totalRequest").innerText =
+pending + approved + rejected;
+
+document.getElementById("pendingCount").innerText = pending;
+document.getElementById("approvedCount").innerText = approved;
+document.getElementById("rejectedCount").innerText = rejected;
+
+}
+
+function searchRequest(){
+
+let input =
+document.getElementById("search").value.toLowerCase();
+
+let cards =
+document.querySelectorAll(".card");
+
+cards.forEach(card=>{
+
+if(card.innerText.toLowerCase().includes(input)){
+card.style.display="block";
+}else{
+card.style.display="none";
+}
+
+});
+
+}
+
+setTimeout(updateDashboard,1000);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Registration
+window.register = async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।");
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+// Login
+window.login = async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    location.href = "index.html";
+  } catch (e) {
+    alert("Login ব্যর্থ: " + e.message);
+  }
+};
+
+// Logout
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "login.html";
+};
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+
+<script type="module" src="auth.js"></script>
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const db = getFirestore();
+const auth = getAuth();
+
+// নতুন ইউজার তৈরি
+async function createUser() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+        await setDoc(ref, {
+            uid: user.uid,
+            email: user.email,
+            balance: 0,
+            referralCode: user.uid.substring(0,6),
+            referredBy: "",
+            totalReferral: 0,
+            dailyBonus: 0,
+            createdAt: new Date()
+        });
+    }
+}
+
+// Daily Bonus
+window.claimDailyBonus = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "users", user.uid);
+
+    await updateDoc(ref, {
+        balance: increment(5),
+        dailyBonus: increment(1)
+    });
+
+    alert("✅ ৫ টাকা Daily Bonus যোগ হয়েছে");
+};
+
+// Referral Reward
+window.useReferral = async (code) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "users", user.uid);
+
+    await updateDoc(ref, {
+        referredBy: code,
+        balance: increment(10)
+    });
+
+    alert("🎉 Referral Reward ১০ টাকা যোগ হয়েছে");
+};
+
+createUser();
+<h3>Referral</h3>
+
+<input
+type="text"
+id="refCode"
+placeholder="Referral Code">
+
+<button onclick="useReferral(document.getElementById('refCode').value)">
+Referral ব্যবহার করুন
+</button>
+
+<hr>
+
+<button onclick="claimDailyBonus()">
+Daily Bonus (+৫ টাকা)
+</button>
+import {
+  doc,
+  updateDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const auth = getAuth();
+
+// Spin Wheel
+window.spinWheel = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const prizes = [1, 2, 5, 10, 20];
+    const reward = prizes[Math.floor(Math.random() * prizes.length)];
+
+    await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(reward)
+    });
+
+    alert(`🎉 অভিনন্দন! আপনি ${reward} টাকা জিতেছেন।`);
+};
+
+// Task Reward
+window.completeTask = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(3)
+    });
+
+    alert("✅ Task সম্পন্ন হয়েছে। ৩ টাকা যোগ হয়েছে।");
+};
+<div class="card">
+    <h3>🎡 Spin & Earn</h3>
+    <button onclick="spinWheel()">Spin Wheel</button>
+</div>
+
+<div class="card">
+    <h3>📋 Daily Task</h3>
+    <button onclick="completeTask()">Complete Task (+3 টাকা)</button>
+</div>
+<div class="card">
+    <h3>👤 My Profile</h3>
+
+    <p>নাম: <span id="userName"></span></p>
+    <p>ইমেইল: <span id="userEmail"></span></p>
+    <p>ব্যালেন্স: <span id="userBalance">0</span> টাকা</p>
+</div>
+
+<div class="card">
+    <h3>📜 Transaction History</h3>
+    <div id="history"></div>
+</div>
+
+<div class="card">
+    <h3>🏆 Leaderboard</h3>
+    <div id="leaderboard"></div>
+</div>
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const db = getFirestore();
+const auth = getAuth();
+
+async function loadProfile() {
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const snap = await getDoc(doc(db,"users",user.uid));
+
+    if(snap.exists()){
+
+        const data=snap.data();
+
+        document.getElementById("userName").innerText=data.name||"User";
+        document.getElementById("userEmail").innerText=user.email;
+        document.getElementById("userBalance").innerText=data.balance||0;
+
+    }
+
+}
+
+async function loadLeaderboard(){
+
+    const q=query(
+        collection(db,"users"),
+        orderBy("balance","desc"),
+        limit(10)
+    );
+
+    const snapshot=await getDocs(q);
+
+    let html="";
+
+    let i=1;
+
+    snapshot.forEach(doc=>{
+
+        const d=doc.data();
+
+        html+=`
+        <p>${i}. ${d.name||"User"} - ${d.balance} টাকা</p>
+        `;
+
+        i++;
+
+    });
+
+    document.getElementById("leaderboard").innerHTML=html;
+
+}
+
+async function loadHistory(){
+
+    const user=auth.currentUser;
+    if(!user)return;
+
+    const snapshot=await getDocs(
+        collection(db,"users",user.uid,"transactions")
+    );
+
+    let html="";
+
+    snapshot.forEach(doc=>{
+
+        const d=doc.data();
+
+        html+=`
+        <div style="border-bottom:1px solid #ddd;padding:8px;">
+        ${d.type} - ${d.amount} টাকা
+        </div>
+        `;
+
+    });
+
+    document.getElementById("history").innerHTML=html;
+
+}
+
+loadProfile();
+loadLeaderboard();
+loadHistory();
+<div class="card">
+    <h3>💸 Withdraw History</h3>
+    <div id="withdrawHistory">Loading...</div>
+</div>
+
+<div class="card">
+    <h3>🔔 Notifications</h3>
+    <div id="notifications">কোনো নোটিফিকেশন নেই</div>
+</div>
+
+<div class="card">
+    <h3>⚙️ Settings</h3>
+
+    <button onclick="changeName()">নাম পরিবর্তন</button>
+    <button onclick="changePhoto()">প্রোফাইল ছবি</button>
+    <button onclick="logout()">Logout</button>
+</div>
+import {
+collection,
+query,
+where,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Withdraw History
+async function loadWithdrawHistory(){
+
+const user=auth.currentUser;
+if(!user) return;
+
+const q=query(
+collection(db,"withdraws"),
+where("uid","==",user.uid)
+);
+
+const snapshot=await getDocs(q);
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`
+<div class="card">
+<b>${d.amount} টাকা</b><br>
+${d.method}<br>
+Status: ${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("withdrawHistory").innerHTML=html;
+
+}
+
+// Change Name
+window.changeName=async()=>{
+
+const name=prompt("নতুন নাম লিখুন");
+
+if(!name) return;
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+name:name
+});
+
+alert("নাম আপডেট হয়েছে");
+
+location.reload();
+
+};
+
+// Change Photo
+window.changePhoto=()=>{
+
+alert("পরবর্তী Part-এ Firebase Storage যোগ করা হবে।");
+
+};
+
+loadWithdrawHistory();
+<div class="card">
+    <h3>🌙 Theme</h3>
+    <button onclick="toggleTheme()">Dark / Light Mode</button>
+</div>
+
+<div class="card">
+    <h3>🌐 Language</h3>
+    <select id="language" onchange="changeLanguage()">
+        <option value="bn">বাংলা</option>
+        <option value="en">English</option>
+    </select>
+</div>
+
+<div class="card">
+    <h3>📷 Profile Photo</h3>
+    <input type="file" id="photo" accept="image/*">
+    <button onclick="uploadPhoto()">Upload</button>
+</div>
+
+<div class="card">
+    <h3>🎁 Daily Check-in</h3>
+    <button onclick="dailyCheckin()">Check In (+2 টাকা)</button>
+</div>
+// Dark Mode
+window.toggleTheme = () => {
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
+};
+
+// Theme Load
+if(localStorage.getItem("theme") === "dark"){
+    document.body.classList.add("dark");
+}
+
+// Language
+window.changeLanguage = () => {
+
+    const lang =
+    document.getElementById("language").value;
+
+    localStorage.setItem("lang", lang);
+
+    alert("Language Changed");
+};
+
+// Daily Check-in
+window.dailyCheckin = async () => {
+
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    await updateDoc(doc(db,"users",user.uid),{
+
+        balance: increment(2)
+
+    });
+
+    alert("✅ Daily Check-in সফল! ২ টাকা যোগ হয়েছে।");
+
+};
+
+// Profile Photo
+window.uploadPhoto = () => {
+
+    alert("Firebase Storage Upload এখানে যোগ করতে হবে।");
+
+};
+.dark{
+    background:#111;
+    color:#fff;
+}
+
+.dark .card{
+    background:#222;
+    color:#fff;
+}
+import {
+ getStorage,
+ ref,
+ uploadBytes,
+ getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+const storage = getStorage();
+window.uploadPhoto = async () => {
+
+ const user = auth.currentUser;
+
+ if(!user){
+   alert("Login করুন");
+   return;
+ }
+
+ const file =
+ document.getElementById("photo").files[0];
+
+ if(!file){
+   alert("ছবি নির্বাচন করুন");
+   return;
+ }
+
+ const storageRef =
+ ref(storage, "profiles/" + user.uid);
+
+ await uploadBytes(storageRef, file);
+
+ const photoURL =
+ await getDownloadURL(storageRef);
+
+ await updateDoc(
+ doc(db,"users",user.uid),
+ {
+   photoURL: photoURL
+ });
+
+ alert("✅ Profile Photo Upload সফল");
+
+ location.reload();
+
+};
+<img
+id="profileImage"
+src=""
+width="100"
+height="100"
+style="border-radius:50%;">
+async function sendNotification(
+title,
+message
+){
+
+ await addDoc(
+ collection(db,"notifications"),
+ {
+   title:title,
+   message:message,
+   createdAt:new Date()
+ });
+
+}
+async function loadNotifications(){
+
+ const snapshot =
+ await getDocs(
+ collection(db,"notifications")
+ );
+
+ let html="";
+
+ snapshot.forEach(doc=>{
+
+ const d=doc.data();
+
+ html += `
+ <div class="card">
+ <b>${d.title}</b><br>
+ ${d.message}
+ </div>
+ `;
+
+ });
+
+ document.getElementById(
+ "notifications"
+ ).innerHTML=html;
+
+}
+
+loadNotifications();
+<div class="card">
+    <h3>💎 VIP Membership</h3>
+    <p id="vipStatus">Normal User</p>
+    <button onclick="buyVIP()">VIP Activate</button>
+</div>
+
+<div class="card">
+    <h3>🎁 Gift Code</h3>
+    <input type="text" id="giftCode" placeholder="Gift Code">
+    <button onclick="redeemGift()">Redeem</button>
+</div>
+
+<div class="card">
+    <h3>🏆 Achievement</h3>
+    <p id="achievement">No Achievement</p>
+</div>
+import {
+doc,
+updateDoc,
+getDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// VIP Activate
+window.buyVIP = async () => {
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+vip:true
+
+});
+
+document.getElementById("vipStatus").innerHTML="💎 VIP Member";
+
+alert("VIP সফলভাবে চালু হয়েছে");
+
+};
+
+// Gift Code
+window.redeemGift = async () => {
+
+const code =
+document.getElementById("giftCode").value;
+
+if(code==="BANGLA100"){
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+balance:increment(100)
+
+});
+
+alert("১০০ টাকা যোগ হয়েছে");
+
+}else{
+
+alert("Gift Code সঠিক নয়");
+
+}
+
+};
+
+// Achievement
+async function loadAchievement(){
+
+const snap =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+const data=snap.data();
+
+if(data.balance>=1000){
+
+document.getElementById("achievement").innerHTML=
+"🥇 Gold Earner";
+
+}else if(data.balance>=500){
+
+document.getElementById("achievement").innerHTML=
+"🥈 Silver Earner";
+
+}else{
+
+document.getElementById("achievement").innerHTML=
+"🥉 Beginner";
+
+}
+
+}
+
+loadAchievement();
+<div class="card">
+    <h3>📅 Daily Login Streak</h3>
+    <p>Streak: <span id="streak">0</span> দিন</p>
+    <button onclick="claimStreak()">আজকের Reward নিন</button>
+</div>
+
+<div class="card">
+    <h3>👥 Referral Commission</h3>
+    <p>মোট কমিশন: <span id="refCommission">0</span> টাকা</p>
+</div>
+
+<div class="card">
+    <h3>💰 Reward History</h3>
+    <div id="rewardHistory"></div>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment,
+collection,
+addDoc,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Streak
+window.claimStreak = async () => {
+
+const user = auth.currentUser;
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+
+await updateDoc(ref,{
+streak: increment(1),
+balance: increment(2)
+});
+
+await addDoc(
+collection(db,"users",user.uid,"rewards"),
+{
+type:"Daily Login",
+amount:2,
+date:new Date()
+});
+
+alert("✅ আজকের ২ টাকা যোগ হয়েছে");
+
+loadRewardHistory();
+
+};
+
+// Reward History
+async function loadRewardHistory(){
+
+const user=auth.currentUser;
+if(!user) return;
+
+const snapshot=await getDocs(
+collection(db,"users",user.uid,"rewards")
+);
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+${d.type}<br>
++${d.amount} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("rewardHistory").innerHTML=html;
+
+}
+
+// Referral Commission
+async function loadReferralCommission(){
+
+const user=auth.currentUser;
+if(!user) return;
+
+const snap=await getDoc(doc(db,"users",user.uid));
+
+const data=snap.data();
+
+document.getElementById("refCommission").innerHTML =
+data.referralIncome || 0;
+
+}
+
+loadRewardHistory();
+loadReferralCommission();
+<div class="card">
+    <h2>📊 Dashboard</h2>
+
+    <p>👥 Total Users : <span id="totalUsers">0</span></p>
+
+    <p>💸 Total Withdraw : <span id="totalWithdraw">0</span></p>
+
+    <p>⏳ Pending : <span id="pendingWithdraw">0</span></p>
+
+    <p>✅ Approved : <span id="approvedWithdraw">0</span></p>
+
+    <p>❌ Rejected : <span id="rejectedWithdraw">0</span></p>
+
+    <p>💰 Total Balance : <span id="totalBalance">0</span></p>
+</div>
+
+<div class="card">
+    <button onclick="loadDashboard()">
+        🔄 Refresh
+    </button>
+</div>
+import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadDashboard(){
+
+let users=0;
+let balance=0;
+
+const userSnap=await getDocs(collection(db,"users"));
+
+userSnap.forEach(doc=>{
+
+users++;
+
+balance += doc.data().balance || 0;
+
+});
+
+document.getElementById("totalUsers").innerHTML=users;
+
+document.getElementById("totalBalance").innerHTML=balance;
+
+let withdraw=0;
+let pending=0;
+let approved=0;
+let rejected=0;
+
+const withdrawSnap=await getDocs(collection(db,"withdraws"));
+
+withdrawSnap.forEach(doc=>{
+
+withdraw++;
+
+const s=doc.data().status;
+
+if(s=="Pending") pending++;
+
+if(s=="Approved") approved++;
+
+if(s=="Rejected") rejected++;
+
+});
+
+document.getElementById("totalWithdraw").innerHTML=withdraw;
+
+document.getElementById("pendingWithdraw").innerHTML=pending;
+
+document.getElementById("approvedWithdraw").innerHTML=approved;
+
+document.getElementById("rejectedWithdraw").innerHTML=rejected;
+
+}
+
+loadDashboard();
+<div class="card">
+<h2>👥 User Management</h2>
+
+<input
+type="text"
+id="uid"
+placeholder="User UID">
+
+<input
+type="number"
+id="amount"
+placeholder="Amount">
+
+<button onclick="addBalance()">
+➕ Add Balance
+</button>
+
+<button onclick="deductBalance()">
+➖ Deduct Balance
+</button>
+
+<button onclick="blockUser()">
+🚫 Block User
+</button>
+
+<button onclick="unblockUser()">
+✅ Unblock User
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>📢 Broadcast Notice</h2>
+
+<textarea
+id="notice"
+rows="5"
+placeholder="Write Notice..."></textarea>
+
+<button onclick="sendNotice()">
+Send Notice
+</button>
+
+</div>
+
+r
+import {
+  getAuth
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const auth = getAuth();
+const db = getFirestore();
+
+async function checkAdmin() {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const snap = await getDoc(doc(db, "admins", user.uid));
+
+  if (!snap.exists()) {
+    alert("আপনি Admin নন");
+    location.href = "index.html";
+    return;
+  }
+
+}
+
+checkAdmin();
+admins
+   UID
+      role : "admin"
+
+users
+   UID
+      balance
+      blocked
+      vip
+
+withdraws
+notifications
+tasks
+transactions
+rules_version = '2';
+
+service cloud.firestore {
+
+match /databases/{database}/documents {
+
+match /users/{userId} {
+
+allow read, write:
+if request.auth != null
+&& request.auth.uid == userId;
+
+}
+
+match /withdraws/{id}{
+
+allow create:
+if request.auth != null;
+
+allow read:
+if request.auth != null;
+
+}
+
+match /admins/{id}{
+
+allow read:
+if request.auth != null;
+
+}
+
+}
+
+}
+const userDoc =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+if(userDoc.data().blocked){
+
+alert("আপনার অ্যাকাউন্ট ব্লক করা হয়েছে");
+
+await auth.signOut();
+
+location.href="login.html";
+
+}
+function exportCSV(data){
+
+let csv="Name,Amount,Status\n";
+
+data.forEach(item=>{
+
+csv +=
+`${item.name},
+${item.amount},
+${item.status}\n`;
+
+});
+
+const blob=
+new Blob([csv],{
+type:"text/csv"
+});
+
+const a=
+document.createElement("a");
+
+a.href=
+URL.createObjectURL(blob);
+
+a.download=
+"withdraws.csv";
+
+a.click();
+
+}
+<div class="card">
+    <h3>💬 Support</h3>
+
+    <textarea
+        id="supportMessage"
+        placeholder="আপনার সমস্যাটি লিখুন"></textarea>
+
+    <button onclick="sendSupportMessage()">
+        Send
+    </button>
+</div>
+
+<div class="card">
+    <h3>📨 My Support Messages</h3>
+
+    <div id="supportList"></div>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+query,
+where,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Send Support Message
+window.sendSupportMessage = async () => {
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const msg =
+document.getElementById("supportMessage").value;
+
+if(msg==""){
+alert("Message লিখুন");
+return;
+}
+
+await addDoc(collection(db,"support"),{
+
+uid:user.uid,
+
+email:user.email,
+
+message:msg,
+
+status:"Pending",
+
+createdAt:serverTimestamp()
+
+});
+
+alert("Support Message পাঠানো হয়েছে");
+
+document.getElementById("supportMessage").value="";
+
+loadSupport();
+
+};
+
+// Load Support Messages
+async function loadSupport(){
+
+const user=auth.currentUser;
+
+if(!user) return;
+
+const q=query(
+collection(db,"support"),
+where("uid","==",user.uid)
+);
+
+const snapshot=await getDocs(q);
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+<b>Status:</b> ${d.status}<br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("supportList").innerHTML=html;
+
+}
+
+loadSupport();
+<div class="card">
+<h3>📩 Support Requests</h3>
+
+<div id="supportRequests"></div>
+
+</div>
+import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadSupportRequests(){
+
+const snapshot =
+await getDocs(collection(db,"support"));
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+<b>${d.email}</b><br>
+
+${d.message}<br>
+
+Status : ${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("supportRequests").innerHTML=html;
+
+}
+
+loadSupportRequests();
+<div class="card">
+    <h3>🎁 Coupon Code</h3>
+
+    <input type="text" id="coupon" placeholder="Coupon Code">
+
+    <button onclick="redeemCoupon()">
+        Redeem
+    </button>
+</div>
+
+<div class="card">
+    <h3>🏆 Referral Leaderboard</h3>
+
+    <div id="refLeaderboard"></div>
+</div>
+
+<div class="card">
+    <h3>📢 App Update</h3>
+
+    <div id="updateNotice">
+        Loading...
+    </div>
+</div>
+import {
+collection,
+query,
+orderBy,
+limit,
+getDocs,
+doc,
+updateDoc,
+increment,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Coupon
+window.redeemCoupon = async () => {
+
+const code =
+document.getElementById("coupon").value;
+
+if(code==="WELCOME50"){
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+balance:increment(50)
+
+});
+
+alert("৫০ টাকা যোগ হয়েছে");
+
+}else{
+
+alert("Invalid Coupon");
+
+}
+
+};
+
+// Referral Leaderboard
+
+async function loadReferralLeaderboard(){
+
+const q=query(
+
+collection(db,"users"),
+
+orderBy("totalReferral","desc"),
+
+limit(10)
+
+);
+
+const snap=await getDocs(q);
+
+let html="";
+
+let i=1;
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<p>${i}. ${d.name || "User"} - ${d.totalReferral} Referral</p>
+`;
+
+i++;
+
+});
+
+document.getElementById("refLeaderboard").innerHTML=html;
+
+}
+
+// Update Notice
+
+async function loadUpdateNotice(){
+
+const snap=
+await getDoc(doc(db,"settings","app"));
+
+if(snap.exists()){
+
+document.getElementById("updateNotice").innerHTML=
+snap.data().notice;
+
+}
+
+}
+
+loadReferralLeaderboard();
+loadUpdateNotice();
+await updateDoc(doc(db,"settings","app"),{
+
+notice:"🎉 নতুন ভার্সন প্রকাশ হয়েছে।"
+
+});
+{
+  "name": "Bangla Yeasin Earn",
+  "short_name": "BYEarn",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+const CACHE_NAME = "bye-v1";
+
+const FILES = [
+  "/",
+  "/index.html",
+  "/style.css",
+  "/app.js",
+  "/manifest.json"
+];
+
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES))
+  );
+});
+
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
+<link rel="manifest" href="manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+<button id="installBtn" style="display:none">
+📲 Install App
+</button>
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+
+e.preventDefault();
+
+deferredPrompt = e;
+
+document.getElementById("installBtn").style.display = "block";
+
+});
+
+document.getElementById("installBtn").onclick = async () => {
+
+if (!deferredPrompt) return;
+
+deferredPrompt.prompt();
+
+await deferredPrompt.userChoice;
+
+deferredPrompt = null;
+
+};
