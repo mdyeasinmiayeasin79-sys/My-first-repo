@@ -5720,3 +5720,5437 @@ rewardHistory
  │   ├── uid
  │   ├── amount
  │   └── createdAt
+
+    <div class="card">
+  <h3>🔐 Admin Login</h3>
+
+  <input
+    type="password"
+    id="adminPassword"
+    placeholder="Enter Admin Password"
+  >
+
+  <button onclick="adminLogin()">
+    Login
+  </button>
+
+  <p id="loginStatus"></p>
+</div>
+
+<div id="adminPanel" style="display:none;">
+
+  <div class="card">
+    <h3>🛡 Admin Panel</h3>
+
+    <p>Welcome Admin!</p>
+
+    <button onclick="adminLogout()">
+      Logout
+    </button>
+  </div>
+
+</div>
+const ADMIN_PASSWORD = "CHANGE_THIS_PASSWORD";
+
+window.adminLogin = () => {
+
+    const pass =
+    document.getElementById("adminPassword").value;
+
+    if(pass === ADMIN_PASSWORD){
+
+        sessionStorage.setItem("admin","true");
+
+        document.getElementById("adminPanel").style.display="block";
+
+        document.getElementById("loginStatus").innerHTML =
+        "✅ Login Successful";
+
+    }else{
+
+        document.getElementById("loginStatus").innerHTML =
+        "❌ Wrong Password";
+
+    }
+
+};
+
+window.adminLogout = () => {
+
+    sessionStorage.removeItem("admin");
+
+    location.reload();
+
+};
+
+if(sessionStorage.getItem("admin")==="true"){
+
+    document.getElementById("adminPanel").style.display="block";
+
+}
+    <div class="card">
+    <h3>🚫 User Ban / Unban</h3>
+
+    <input
+        type="text"
+        id="banUid"
+        placeholder="User UID"
+    >
+
+    <button onclick="banUser()">
+        Ban User
+    </button>
+
+    <button onclick="unbanUser()">
+        Unban User
+    </button>
+
+    <p id="banStatus"></p>
+    </div>
+    import {
+    doc,
+    setDoc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.banUser = async () => {
+
+    const uid =
+    document.getElementById("banUid").value;
+
+    if(!uid){
+        alert("Enter UID");
+        return;
+    }
+
+    await setDoc(doc(db,"users",uid),{
+        banned:true
+    },{merge:true});
+
+    document.getElementById("banStatus").innerHTML =
+    "🚫 User Banned";
+};
+
+window.unbanUser = async () => {
+
+    const uid =
+    document.getElementById("banUid").value;
+
+    if(!uid){
+        alert("Enter UID");
+        return;
+    }
+
+    await updateDoc(doc(db,"users",uid),{
+        banned:false
+    });
+
+    document.getElementById("banStatus").innerHTML =
+    "✅ User Unbanned";
+};import {
+    doc,
+    setDoc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.banUser = async () => {
+
+    const uid =
+    document.getElementById("banUid").value;
+
+    if(!uid){
+        alert("Enter UID");
+        return;
+    }
+
+    await setDoc(doc(db,"users",uid),{
+        banned:true
+    },{merge:true});
+
+    document.getElementById("banStatus").innerHTML =
+    "🚫 User Banned";
+};
+
+window.unbanUser = async () => {
+
+    const uid =
+    document.getElementById("banUid").value;
+
+    if(!uid){
+        alert("Enter UID");
+        return;
+    }
+
+    await updateDoc(doc(db,"users",uid),{
+        banned:false
+    });
+
+    document.getElementById("banStatus").innerHTML =
+    "✅ User Unbanned
+    import {
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const userRef = doc(db,"users",user.uid);
+
+const userSnap = await getDoc(userRef);
+
+if(userSnap.exists()){
+
+    if(userSnap.data().banned){
+
+        alert("🚫 Your account has been banned.");
+
+        return;
+    }
+}
+    <div class="card">
+    <h3>💸 Withdraw Requests</h3>
+
+    <div id="withdrawRequests"></div>
+    </div>
+    import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.loadWithdrawRequests = async () => {
+
+    const snap = await getDocs(collection(db,"withdrawRequests"));
+
+    let html = "";
+
+    snap.forEach(item=>{
+
+        const d = item.data();
+
+        html += `
+        <div class="card">
+            <b>${d.name}</b><br>
+            Amount: ${d.amount} Tk<br>
+            Method: ${d.method}<br>
+            Number: ${d.number}<br>
+            Status: ${d.status}<br><br>
+
+            <button onclick="approveWithdraw('${item.id}')">
+                ✅ Approve
+            </button>
+
+            <button onclick="rejectWithdraw('${item.id}')">
+                ❌ Reject
+            </button>
+        </div>
+        `;
+    });
+
+    document.getElementById("withdrawRequests").innerHTML = html;
+};
+
+window.approveWithdraw = async(id)=>{
+
+    await updateDoc(doc(db,"withdrawRequests",id),{
+        status:"Approved"
+    });
+
+    alert("✅ Withdraw Approved");
+
+    loadWithdrawRequests();
+};
+
+window.rejectWithdraw = async(id)=>{
+
+    await updateDoc(doc(db,"withdrawRequests",id),{
+        status:"Rejected"
+    });
+
+    alert("❌ Withdraw Rejected");
+
+    loadWithdrawRequests();
+};
+
+loadWithdrawRequests();
+    withdrawRequests
+ └── documentId
+      ├── uid
+      ├── name
+      ├── amount
+      ├── method
+      ├── number
+      ├── status
+      └── createdAt
+    <div class="card">
+    <h3>📜 Withdraw History</h3>
+
+    <div id="withdrawHistory"></div>
+    </div>
+    import {
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.loadWithdrawHistory = async () => {
+
+    const q = query(
+        collection(db,"withdrawRequests"),
+        where("uid","==",user.uid)
+    );
+
+    const snap = await getDocs(q);
+
+    let html = "";
+
+    snap.forEach(doc=>{
+
+        const d = doc.data();
+
+        html += `
+        <div class="card">
+            <b>💸 ${d.amount} টাকা</b><br>
+
+            Method: ${d.method}<br>
+
+            Number: ${d.number}<br>
+
+            Status:
+            <b>${d.status}</b><br>
+
+            Date:
+            ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+        </div>
+        `;
+    });
+
+    document.getElementById("withdrawHistory").innerHTML = html;
+};
+
+loadWithdrawHistory();
+    Pending
+Approved
+Processing
+Paid
+Rejected
+    withdrawRequests
+ └── documentId
+      ├── uid
+      ├── amount
+      ├── method
+      ├── number
+      ├── status
+      ├── transactionId
+      └── createdAt
+    <div class="card">
+    <h3>📋 Admin Activity Log</h3>
+    <div id="activityLog"></div>
+</div>
+
+<div class="card">
+    <h3>👤 Active User Sessions</h3>
+    <div id="sessionList"></div>
+</div>
+
+<div class="card">
+    <h3>🚨 Security Alerts</h3>
+    <div id="securityAlerts"></div>
+</div>
+import {
+collection,
+getDocs,
+query,
+orderBy,
+limit
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Admin Activity Log
+async function loadActivityLog(){
+
+const snap = await getDocs(
+query(
+collection(db,"adminLogs"),
+orderBy("createdAt","desc"),
+limit(20)
+)
+);
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+<b>${d.action}</b><br>
+${d.adminEmail}<br>
+${d.createdAt?.toDate?.().toLocaleString() || ""}
+</div>
+`;
+
+});
+
+document.getElementById("activityLog").innerHTML = html;
+
+}
+
+// Active Sessions
+async function loadSessions(){
+
+const snap = await getDocs(collection(db,"userSessions"));
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+${d.email}<br>
+Status: ${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("sessionList").innerHTML = html;
+
+}
+
+// Security Alerts
+async function loadAlerts(){
+
+const snap = await getDocs(collection(db,"securityAlerts"));
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+🚨 ${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("securityAlerts").innerHTML = html;
+
+}
+
+loadActivityLog();
+loadSessions();
+loadAlerts();
+    adminLogs
+ └── documentId
+      ├── adminEmail
+      ├── action
+      └── createdAt
+
+userSessions
+ └── documentId
+      ├── uid
+      ├── email
+      ├── status
+      └── lastSeen
+
+securityAlerts
+ └── documentId
+      ├── message
+      ├── level
+      └── createdAt
+    <div class="card">
+    <h3>💳 Complete Payment</h3>
+
+    <input
+        type="text"
+        id="withdrawId"
+        placeholder="Withdraw Request ID">
+
+    <input
+        type="text"
+        id="transactionId"
+        placeholder="Transaction ID">
+
+    <button onclick="completePayment()">
+        Mark as Paid
+    </button>
+
+    <p id="paymentStatus"></p>
+    </div>
+    import {
+doc,
+updateDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.completePayment = async()=>{
+
+const withdrawId =
+document.getElementById("withdrawId").value.trim();
+
+const transactionId =
+document.getElementById("transactionId").value.trim();
+
+if(!withdrawId || !transactionId){
+
+alert("সব তথ্য পূরণ করুন");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"withdrawRequests",withdrawId),
+{
+
+status:"Paid",
+
+transactionId:transactionId,
+
+paidAt:serverTimestamp()
+
+});
+
+document.getElementById("paymentStatus").innerHTML =
+"✅ Payment Completed";
+
+};
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadPaymentInfo(withdrawId){
+
+const snap =
+await getDoc(doc(db,"withdrawRequests",withdrawId));
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+document.getElementById("paymentInfo").innerHTML = `
+<b>Status:</b> ${data.status}<br>
+<b>Transaction ID:</b> ${data.transactionId || "-"}<br>
+<b>Paid At:</b> ${data.paidAt?.toDate?.().toLocaleString() || "-"}
+`;
+
+}
+    withdrawRequests
+ └── documentId
+      ├── uid
+      ├── amount
+      ├── method
+      ├── number
+      ├── status
+      ├── transactionId
+      ├── paidAt
+      └── createdAt
+    <div class="card">
+    <h3>📊 Withdraw Report</h3>
+
+    <p>Total Withdraw:
+        <span id="totalWithdraw">0</span>
+    </p>
+
+    <p>Total Paid:
+        <span id="totalPaid">0</span>
+    </p>
+
+    <button onclick="loadWithdrawReport()">
+        Refresh
+    </button>
+</div>
+
+<div class="card">
+    <h3>📄 Export Report</h3>
+
+    <button onclick="exportReport()">
+        Export JSON
+    </button>
+</div>
+
+<div class="card">
+    <h3>💳 User Payment History</h3>
+
+    <div id="paymentHistory"></div>
+</div>
+import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.loadWithdrawReport = async()=>{
+
+const snap = await getDocs(
+collection(db,"withdrawRequests")
+);
+
+let totalWithdraw = 0;
+let totalPaid = 0;
+let report = [];
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+totalWithdraw++;
+
+if(d.status==="Paid"){
+totalPaid++;
+}
+
+report.push({
+id:doc.id,
+...d
+});
+
+});
+
+document.getElementById("totalWithdraw").innerHTML =
+totalWithdraw;
+
+document.getElementById("totalPaid").innerHTML =
+totalPaid;
+
+window.withdrawReport = report;
+
+};
+
+window.exportReport = ()=>{
+
+const blob = new Blob(
+[
+JSON.stringify(window.withdrawReport,null,2)
+],
+{
+type:"application/json"
+}
+);
+
+const a = document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download = "withdraw-report.json";
+
+a.click();
+
+};
+
+loadWithdrawReport();
+    import {
+collection,
+query,
+where,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadPaymentHistory(){
+
+const q = query(
+collection(db,"withdrawRequests"),
+where("uid","==",auth.currentUser.uid)
+);
+
+const snap = await getDocs(q);
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+💰 ${d.amount} টাকা<br>
+📌 ${d.method}<br>
+📊 ${d.status}<br>
+🆔 ${d.transactionId || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("paymentHistory").innerHTML =
+html;
+
+}
+
+loadPaymentHistory();
+    withdrawRequests
+ └── documentId
+      ├── uid
+      ├── amount
+      ├── method
+      ├── status
+      ├── transactionId
+      ├── paidAt
+      └── createdAt
+    <div class="card">
+    <h3>📊 Dashboard Summary</h3>
+
+    <p>Total Users:
+        <span id="dashboardUsers">0</span>
+    </p>
+
+    <p>Total Withdraw:
+        <span id="dashboardWithdraws">0</span>
+    </p>
+
+    <p>Total Paid:
+        <span id="dashboardPaid">0</span>
+    </p>
+</div>
+
+<div class="card">
+    <h3>🔍 Search Withdraw</h3>
+
+    <input
+        type="text"
+        id="searchWithdrawId"
+        placeholder="Withdraw ID">
+
+    <button onclick="searchWithdraw()">
+        Search
+    </button>
+
+    <div id="searchResult"></div>
+</div>
+
+<div class="card">
+    <h3>👤 User Details</h3>
+
+    <input
+        type="text"
+        id="userUid"
+        placeholder="User UID">
+
+    <button onclick="loadUserDetails()">
+        Load User
+    </button>
+
+    <div id="userDetails"></div>
+</div>
+import {
+collection,
+getDocs,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Dashboard Summary
+window.loadDashboard = async()=>{
+
+const users =
+await getDocs(collection(db,"users"));
+
+const withdraws =
+await getDocs(collection(db,"withdrawRequests"));
+
+let paid = 0;
+
+withdraws.forEach(item=>{
+
+if(item.data().status==="Paid"){
+paid++;
+}
+
+});
+
+document.getElementById("dashboardUsers").innerHTML =
+users.size;
+
+document.getElementById("dashboardWithdraws").innerHTML =
+withdraws.size;
+
+document.getElementById("dashboardPaid").innerHTML =
+paid;
+
+};
+
+// Search Withdraw
+window.searchWithdraw = async()=>{
+
+const id =
+document.getElementById("searchWithdrawId").value.trim();
+
+const snap =
+await getDoc(doc(db,"withdrawRequests",id));
+
+if(!snap.exists()){
+
+document.getElementById("searchResult").innerHTML =
+"❌ Not Found";
+
+return;
+
+}
+
+const d = snap.data();
+
+document.getElementById("searchResult").innerHTML = `
+Amount: ${d.amount} Tk<br>
+Method: ${d.method}<br>
+Status: ${d.status}
+`;
+
+};
+
+// User Details
+window.loadUserDetails = async()=>{
+
+const uid =
+document.getElementById("userUid").value.trim();
+
+const snap =
+await getDoc(doc(db,"users",uid));
+
+if(!snap.exists()){
+
+document.getElementById("userDetails").innerHTML =
+"❌ User Not Found";
+
+return;
+
+}
+
+const d = snap.data();
+
+document.getElementById("userDetails").innerHTML = `
+Name: ${d.name || "-"}<br>
+Email: ${d.email || "-"}<br>
+Balance: ${d.balance || 0}<br>
+Verified: ${d.verified ? "Yes" : "No"}
+`;
+
+};
+
+loadDashboard();
+    users
+ └── uid
+      ├── name
+      ├── email
+      ├── balance
+      └── verified
+
+withdrawRequests
+ └── documentId
+      ├── amount
+      ├── method
+      ├── status
+    <div class="card">
+    <h3>👤 User Management</h3>
+
+    <input type="text"
+           id="searchUserUid"
+           placeholder="Enter User UID">
+
+    <button onclick="searchUser()">
+        Search User
+    </button>
+
+    <div id="userInfo"></div>
+</div>
+
+<div class="card">
+    <h3>💰 Update User Balance</h3>
+
+    <input type="number"
+           id="newBalance"
+           placeholder="New Balance">
+
+    <button onclick="updateBalance()">
+        Update Balance
+    </button>
+
+    <p id="balanceStatus"></p>
+</div>
+import {
+doc,
+getDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+let selectedUser = "";
+
+// Search User
+window.searchUser = async()=>{
+
+const uid =
+document.getElementById("searchUserUid").value.trim();
+
+if(!uid){
+alert("Enter User UID");
+return;
+}
+
+const snap = await getDoc(doc(db,"users",uid));
+
+if(!snap.exists()){
+
+document.getElementById("userInfo").innerHTML =
+"❌ User Not Found";
+
+return;
+
+}
+
+selectedUser = uid;
+
+const d = snap.data();
+
+document.getElementById("userInfo").innerHTML = `
+<b>Name:</b> ${d.name || "-"}<br>
+<b>Email:</b> ${d.email || "-"}<br>
+<b>Balance:</b> ${d.balance || 0}<br>
+<b>Status:</b> ${d.banned ? "Banned" : "Active"}
+`;
+
+};
+
+// Update Balance
+window.updateBalance = async()=>{
+
+if(!selectedUser){
+
+alert("Search a user first");
+
+return;
+
+}
+
+const balance =
+Number(document.getElementById("newBalance").value);
+
+await updateDoc(
+doc(db,"users",selectedUser),
+{
+balance:balance
+}
+);
+
+document.getElementById("balanceStatus").innerHTML =
+"✅ Balance Updated";
+
+};
+    users
+ └── uid
+      ├── name
+      ├── email
+      ├── balance
+      ├── banned
+      └── verified
+    <div class="card">
+    <h3>👥 All Users</h3>
+
+    <button onclick="loadUsers()">
+        Refresh Users
+    </button>
+
+    <div id="userList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 User Statistics</h3>
+
+    <p>Total Users:
+        <span id="totalUsers">0</span>
+    </p>
+
+    <p>Verified Users:
+        <span id="verifiedUsers">0</span>
+    </p>
+
+    <p>Banned Users:
+        <span id="bannedUsers">0</span>
+    </p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Users
+window.loadUsers = async()=>{
+
+const snap = await getDocs(collection(db,"users"));
+
+let html = "";
+
+let verified = 0;
+let banned = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.verified) verified++;
+
+if(d.banned) banned++;
+
+html += `
+<div class="card">
+<b>${d.name || "Unknown User"}</b><br>
+
+${d.email || "-"}<br>
+
+Balance: ${d.balance || 0}<br>
+
+<button onclick="deleteUser('${item.id}')">
+Delete
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("userList").innerHTML = html;
+
+document.getElementById("totalUsers").innerHTML =
+snap.size;
+
+document.getElementById("verifiedUsers").innerHTML =
+verified;
+
+document.getElementById("bannedUsers").innerHTML =
+banned;
+
+};
+
+// Delete User (Demo)
+window.deleteUser = async(uid)=>{
+
+if(!confirm("Delete this user?")) return;
+
+await deleteDoc(doc(db,"users",uid));
+
+alert("User Deleted");
+
+loadUsers();
+
+};
+
+loadUsers();
+    users
+ └── uid
+      ├── name
+      ├── email
+      ├── balance
+      ├── verified
+      └── banned
+    <div class="card">
+    <h3>🔍 Search User by Email</h3>
+
+    <input
+        type="email"
+        id="searchEmail"
+        placeholder="Enter Email">
+
+    <button onclick="searchUserByEmail()">
+        Search
+    </button>
+
+    <div id="searchResult"></div>
+</div>
+
+<div class="card">
+    <h3>✏️ Edit User Profile</h3>
+
+    <input
+        type="text"
+        id="editName"
+        placeholder="New Name">
+
+    <button onclick="updateUserName()">
+        Update Name
+    </button>
+</div>
+
+<div class="card">
+    <h3>🟢 Account Status</h3>
+
+    <button onclick="activateUser()">
+        Activate
+    </button>
+
+    <button onclick="deactivateUser()">
+        Deactivate
+    </button>
+
+    <p id="accountStatus"></p>
+        </div>
+        import {
+collection,
+query,
+where,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+let selectedUid = "";
+
+// Search User by Email
+window.searchUserByEmail = async()=>{
+
+const email =
+document.getElementById("searchEmail").value.trim();
+
+const q = query(
+collection(db,"users"),
+where("email","==",email)
+);
+
+const snap = await getDocs(q);
+
+if(snap.empty){
+
+document.getElementById("searchResult").innerHTML =
+"❌ User Not Found";
+
+return;
+
+}
+
+snap.forEach(item=>{
+
+selectedUid = item.id;
+
+const d = item.data();
+
+document.getElementById("searchResult").innerHTML = `
+<b>Name:</b> ${d.name}<br>
+<b>Email:</b> ${d.email}<br>
+<b>Status:</b> ${d.active ? "Active" : "Inactive"}
+`;
+
+});
+
+};
+
+// Update Name
+window.updateUserName = async()=>{
+
+if(!selectedUid){
+
+alert("Search User First");
+
+return;
+
+}
+
+const name =
+document.getElementById("editName").value.trim();
+
+await updateDoc(
+doc(db,"users",selectedUid),
+{
+name:name
+}
+);
+
+alert("✅ Name Updated");
+
+};
+
+// Activate User
+window.activateUser = async()=>{
+
+if(!selectedUid) return;
+
+await updateDoc(
+doc(db,"users",selectedUid),
+{
+active:true
+}
+);
+
+document.getElementById("accountStatus").innerHTML =
+"🟢 Active";
+
+};
+
+// Deactivate User
+window.deactivateUser = async()=>{
+
+if(!selectedUid) return;
+
+await updateDoc(
+doc(db,"users",selectedUid),
+{
+active:false
+}
+);
+
+document.getElementById("accountStatus").innerHTML =
+"🔴 Inactive";
+
+};
+    users
+ └── uid
+      ├── name
+      ├── email
+      ├── active
+      ├── verified
+      ├── banned
+      └── balance
+    <div class="card">
+    <h3>📢 Broadcast Message</h3>
+
+    <input
+        type="text"
+        id="broadcastTitle"
+        placeholder="Title">
+
+    <textarea
+        id="broadcastMessage"
+        placeholder="Message"></textarea>
+
+    <button onclick="sendBroadcast()">
+        Send
+    </button>
+</div>
+
+<div class="card">
+    <h3>👑 User Role</h3>
+
+    <input
+        type="text"
+        id="roleUid"
+        placeholder="User UID">
+
+    <select id="userRole">
+        <option value="user">User</option>
+        <option value="moderator">Moderator</option>
+        <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="updateRole()">
+        Update Role
+    </button>
+</div>
+
+<div class="card">
+    <h3>⚙️ System Settings</h3>
+
+    <button onclick="toggleRegistration()">
+        Enable / Disable Registration
+    </button>
+
+    <p id="registrationStatus"></p>
+</div>
+import {
+collection,
+addDoc,
+doc,
+updateDoc,
+setDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Broadcast Message
+window.sendBroadcast = async()=>{
+
+const title =
+document.getElementById("broadcastTitle").value.trim();
+
+const message =
+document.getElementById("broadcastMessage").value.trim();
+
+if(!title || !message){
+
+alert("সব তথ্য পূরণ করুন");
+
+return;
+
+}
+
+await addDoc(collection(db,"notifications"),{
+
+title,
+message,
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Broadcast Sent");
+
+};
+
+// Update User Role
+window.updateRole = async()=>{
+
+const uid =
+document.getElementById("roleUid").value.trim();
+
+const role =
+document.getElementById("userRole").value;
+
+await updateDoc(doc(db,"users",uid),{
+
+role:role
+
+});
+
+alert("✅ Role Updated");
+
+};
+
+// Registration Setting
+window.toggleRegistration = async()=>{
+
+const ref = doc(db,"settings","app");
+
+await setDoc(ref,{
+
+registrationEnabled:false
+
+},{merge:true});
+
+document.getElementById("registrationStatus").innerHTML =
+"Registration Disabled";
+
+};
+    users
+ └── uid
+      ├── role
+      ├── name
+      ├── email
+
+notifications
+ └── documentId
+      ├── title
+      ├── message
+      └── createdAt
+
+settings
+ └── app
+      └── registrationEnabled
+    <div class="card">
+    <h3>💾 Database Backup</h3>
+
+    <button onclick="createBackup()">
+        Create Backup
+    </button>
+
+    <p id="backupStatus"></p>
+</div>
+
+<div class="card">
+    <h3>🔐 User Login Control</h3>
+
+    <button onclick="disableLogin()">
+        Disable Login
+    </button>
+
+    <button onclick="enableLogin()">
+        Enable Login
+    </button>
+
+    <p id="loginControlStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📢 App Announcement</h3>
+
+    <input
+        type="text"
+        id="announcementTitle"
+        placeholder="Announcement Title">
+
+    <textarea
+        id="announcementMessage"
+        placeholder="Announcement Message"></textarea>
+
+    <button onclick="publishAnnouncement()">
+        Publish
+    </button>
+</div>
+import {
+doc,
+setDoc,
+addDoc,
+collection,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Database Backup (Demo)
+window.createBackup = async()=>{
+
+await setDoc(doc(db,"system","backup"),{
+
+lastBackup:serverTimestamp()
+
+},{merge:true});
+
+document.getElementById("backupStatus").innerHTML =
+"✅ Backup Created";
+
+};
+
+// Disable Login
+window.disableLogin = async()=>{
+
+await setDoc(doc(db,"settings","login"),{
+
+enabled:false
+
+},{merge:true});
+
+document.getElementById("loginControlStatus").innerHTML =
+"🔒 Login Disabled";
+
+};
+
+// Enable Login
+window.enableLogin = async()=>{
+
+await setDoc(doc(db,"settings","login"),{
+
+enabled:true
+
+},{merge:true});
+
+document.getElementById("loginControlStatus").innerHTML =
+"🔓 Login Enabled";
+
+};
+
+// Publish Announcement
+window.publishAnnouncement = async()=>{
+
+const title =
+document.getElementById("announcementTitle").value.trim();
+
+const message =
+document.getElementById("announcementMessage").value.trim();
+
+if(!title || !message){
+
+alert("সব তথ্য পূরণ করুন");
+
+return;
+
+}
+
+await addDoc(collection(db,"announcements"),{
+
+title,
+message,
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Announcement Published");
+
+};
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function checkLoginStatus(){
+
+const snap =
+await getDoc(doc(db,"settings","login"));
+
+if(snap.exists() && snap.data().enabled===false){
+
+alert("🔒 Login is temporarily disabled.");
+
+return;
+
+}
+
+}
+
+checkLoginStatus();
+    settings
+ ├── login
+ │    └── enabled
+
+system
+ └── backup
+      └── lastBackup
+
+announcements
+ └── documentId
+      ├── title
+      ├── message
+      └── createdAt
+    <div class="card">
+    <h3>📋 Admin Audit Log</h3>
+
+    <div id="auditLog"></div>
+</div>
+
+<div class="card">
+    <h3>💬 User Feedback</h3>
+
+    <div id="feedbackList"></div>
+</div>
+
+<div class="card">
+    <h3>🟢 System Health</h3>
+
+    <p id="systemHealth">
+        Checking...
+    </p>
+
+    <button onclick="checkSystemHealth()">
+        Refresh
+    </button>
+</div>
+import {
+collection,
+getDocs,
+doc,
+setDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Audit Log
+async function loadAuditLog(){
+
+const snap = await getDocs(collection(db,"adminLogs"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+<b>${d.action}</b><br>
+${d.admin}<br>
+${d.createdAt?.toDate?.().toLocaleString() || ""}
+</div>
+`;
+
+});
+
+document.getElementById("auditLog").innerHTML = html;
+
+}
+
+// Load Feedback
+async function loadFeedback(){
+
+const snap = await getDocs(collection(db,"feedback"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+<b>${d.email}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("feedbackList").innerHTML = html;
+
+}
+
+// System Health (Demo)
+window.checkSystemHealth = async()=>{
+
+document.getElementById("systemHealth").innerHTML =
+"🟢 All Services Running";
+
+await setDoc(doc(db,"system","health"),{
+
+status:"Online",
+
+checkedAt:serverTimestamp()
+
+},{merge:true});
+
+};
+
+loadAuditLog();
+loadFeedback();
+checkSystemHealth();
+    adminLogs
+ └── documentId
+      ├── admin
+      ├── action
+      └── createdAt
+
+feedback
+ └── documentId
+      ├── email
+      ├── message
+      └── createdAt
+
+system
+ └── health
+      ├── status
+      └── checkedAt
+    <div class="card">
+    <h3>📋 Admin Activity Log</h3>
+    <div id="activityLog"></div>
+</div>
+
+<div class="card">
+    <h3>👤 Active User Sessions</h3>
+    <div id="sessionList"></div>
+</div>
+
+<div class="card">
+    <h3>🚨 Security Alerts</h3>
+    <div id="securityAlerts"></div>
+</div>
+import {
+collection,
+getDocs,
+query,
+orderBy,
+limit
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Admin Activity Log
+async function loadActivityLog(){
+
+const snap = await getDocs(
+query(
+collection(db,"adminLogs"),
+orderBy("createdAt","desc"),
+limit(20)
+)
+);
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+<b>${d.action}</b><br>
+${d.adminEmail}<br>
+${d.createdAt?.toDate?.().toLocaleString() || ""}
+</div>
+`;
+
+});
+
+document.getElementById("activityLog").innerHTML = html;
+
+}
+
+// Active Sessions
+async function loadSessions(){
+
+const snap = await getDocs(collection(db,"userSessions"));
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+📧 ${d.email}<br>
+🟢 Status: ${d.status}<br>
+🕒 Last Seen: ${d.lastSeen || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("sessionList").innerHTML = html;
+
+}
+
+// Security Alerts
+async function loadAlerts(){
+
+const snap = await getDocs(collection(db,"securityAlerts"));
+
+let html = "";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+🚨 <b>${d.level}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("securityAlerts").innerHTML = html;
+
+}
+
+loadActivityLog();
+loadSessions();
+loadAlerts();
+    adminLogs
+ └── documentId
+      ├── adminEmail
+      ├── action
+      └── createdAt
+
+userSessions
+ └── documentId
+      ├── uid
+      ├── email
+      ├── status
+      └── lastSeen
+
+securityAlerts
+ └── documentId
+      ├── level
+      ├── message
+      └── createdAt
+    <div class="card">
+    <h3>🌐 Language</h3>
+
+    <select id="languageSelect" onchange="changeLanguage()">
+        <option value="en">English</option>
+        <option value="bn">বাংলা</option>
+    </select>
+</div>
+
+<div class="card">
+    <h3>💬 Live Chat</h3>
+
+    <textarea
+        id="chatMessage"
+        placeholder="Type your message"></textarea>
+
+    <button onclick="sendChat()">
+        Send
+    </button>
+
+    <div id="chatList"></div>
+</div>
+
+<div class="card">
+    <h3>🔔 Notifications</h3>
+
+    <div id="notificationList"></div>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Change Language
+window.changeLanguage = ()=>{
+
+const lang =
+document.getElementById("languageSelect").value;
+
+localStorage.setItem("language",lang);
+
+alert("Language Changed");
+
+};
+
+// Send Chat
+window.sendChat = async()=>{
+
+const msg =
+document.getElementById("chatMessage").value.trim();
+
+if(!msg) return;
+
+await addDoc(collection(db,"liveChat"),{
+
+uid:auth.currentUser.uid,
+
+message:msg,
+
+createdAt:serverTimestamp()
+
+});
+
+document.getElementById("chatMessage").value="";
+
+loadChats();
+
+};
+
+// Load Chat
+async function loadChats(){
+
+const snap =
+await getDocs(collection(db,"liveChat"));
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("chatList").innerHTML=html;
+
+}
+
+// Load Notifications
+async function loadNotifications(){
+
+const snap =
+await getDocs(collection(db,"notifications"));
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("notificationList").innerHTML=html;
+
+}
+
+loadChats();
+loadNotifications();
+    liveChat
+ └── documentId
+      ├── uid
+      ├── message
+      └── createdAt
+
+notifications
+ └── documentId
+      ├── title
+      ├── message
+      └── createdAt
+    <div class="card">
+    <h3>👤 Profile Picture</h3>
+
+    <input
+        type="file"
+        id="profileImage"
+        accept="image/*">
+
+    <button onclick="uploadProfileImage()">
+        Upload
+    </button>
+
+    <img
+        id="profilePreview"
+        width="120"
+        height="120"
+        style="border-radius:50%;margin-top:10px;">
+</div>
+
+<div class="card">
+    <h3>🟢 Online Status</h3>
+
+    <p id="onlineStatus">
+        Offline
+    </p>
+</div>
+
+<div class="card">
+    <h3>✔️ Verification Badge</h3>
+
+    <p id="verifyBadge">
+        Not Verified
+    </p>
+</div>
+import {
+doc,
+getDoc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Upload Profile Image (Demo)
+window.uploadProfileImage = async()=>{
+
+const file =
+document.getElementById("profileImage").files[0];
+
+if(!file){
+
+alert("Select Image");
+
+return;
+
+}
+
+// Demo Preview
+const reader = new FileReader();
+
+reader.onload = function(e){
+
+document.getElementById("profilePreview").src =
+e.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+};
+
+// Load User Profile
+async function loadProfile(){
+
+const snap =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+if(!snap.exists()) return;
+
+const d = snap.data();
+
+document.getElementById("onlineStatus").innerHTML =
+d.online ? "🟢 Online" : "⚪ Offline";
+
+document.getElementById("verifyBadge").innerHTML =
+d.verified ? "✔️ Verified" : "❌ Not Verified";
+
+if(d.photoURL){
+
+document.getElementById("profilePreview").src =
+d.photoURL;
+
+}
+
+}
+
+// Update Online Status
+window.addEventListener("load",async()=>{
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+online:true
+
+});
+
+});
+
+window.addEventListener("beforeunload",async()=>{
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+online:false
+
+});
+
+});
+
+loadProfile();
+    users
+ └── uid
+      ├── photoURL
+      ├── online
+      ├── verified
+      ├── name
+      └── email
+    <div class="card">
+    <h3>⚙️ User Settings</h3>
+
+    <button onclick="toggleDarkMode()">
+        🌙 Dark Mode
+    </button>
+
+    <button onclick="toggleNotifications()">
+        🔔 Notifications
+    </button>
+
+    <button onclick="deactivateAccount()">
+        🚫 Deactivate Account
+    </button>
+</div>
+
+<div class="card">
+    <h3>📱 Settings Status</h3>
+
+    <p id="settingsStatus">Ready</p>
+</div>
+import {
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Dark Mode
+window.toggleDarkMode = ()=>{
+
+document.body.classList.toggle("dark-mode");
+
+const enabled =
+document.body.classList.contains("dark-mode");
+
+localStorage.setItem("darkMode",enabled);
+
+document.getElementById("settingsStatus").innerHTML =
+enabled ? "🌙 Dark Mode Enabled"
+        : "☀️ Light Mode Enabled";
+
+};
+
+// Load Theme
+window.addEventListener("load",()=>{
+
+const enabled =
+localStorage.getItem("darkMode")==="true";
+
+if(enabled){
+
+document.body.classList.add("dark-mode");
+
+}
+
+});
+
+// Notifications
+window.toggleNotifications = ()=>{
+
+const current =
+localStorage.getItem("notifications")==="true";
+
+localStorage.setItem("notifications",!current);
+
+document.getElementById("settingsStatus").innerHTML =
+!current
+? "🔔 Notifications Enabled"
+: "🔕 Notifications Disabled";
+
+};
+
+// Account Deactivation (Demo)
+window.deactivateAccount = async()=>{
+
+if(!confirm("আপনি কি নিশ্চিত?")) return;
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+active:false
+}
+);
+
+alert("🚫 Account Deactivated");
+
+};
+    .dark-mode{
+
+background:#121212;
+
+color:white;
+
+}
+
+.dark-mode .card{
+
+background:#1f1f1f;
+
+color:white;
+
+border:1px solid #333;
+
+}
+    users
+ └── uid
+      ├── active
+      ├── notifications
+      ├── theme
+      └── updatedAt
+    <div class="card">
+    <h3>🏆 Referral Leaderboard</h3>
+    <div id="leaderboard"></div>
+</div>
+
+<div class="card">
+    <h3>🎁 Daily Bonus</h3>
+
+    <button onclick="claimDailyBonus()">
+        Claim Bonus
+    </button>
+
+    <p id="bonusStatus"></p>
+</div>
+
+<div class="card">
+    <h3>🎡 Lucky Spin</h3>
+
+    <button onclick="spinReward()">
+        Spin Now
+    </button>
+
+    <p id="spinResult"></p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Leaderboard
+async function loadLeaderboard(){
+
+const snap = await getDocs(collection(db,"users"));
+
+let html = "";
+
+snap.forEach(user=>{
+
+const d = user.data();
+
+html += `
+<div class="card">
+${d.name || "User"}<br>
+Referrals: ${d.referrals || 0}
+</div>
+`;
+
+});
+
+document.getElementById("leaderboard").innerHTML = html;
+
+}
+
+// Daily Bonus (Demo)
+window.claimDailyBonus = async()=>{
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(5)
+}
+);
+
+document.getElementById("bonusStatus").innerHTML =
+"✅ 5 টাকা Daily Bonus যোগ হয়েছে";
+
+};
+
+// Lucky Spin (Demo)
+window.spinReward = async()=>{
+
+const rewards = [2,5,10,20];
+
+const reward =
+rewards[Math.floor(Math.random()*rewards.length)];
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(reward)
+}
+);
+
+document.getElementById("spinResult").innerHTML =
+`🎉 আপনি ${reward} টাকা জিতেছেন`;
+
+};
+
+loadLeaderboard();
+    users
+ └── uid
+      ├── name
+      ├── balance
+      ├── referrals
+      ├── lastDailyBonus
+      └── lastSpin
+    <div class="card">
+    <h3>🎟 Coupon Code</h3>
+
+    <input
+        type="text"
+        id="couponCode"
+        placeholder="Enter Coupon Code">
+
+    <button onclick="redeemCoupon()">
+        Redeem
+    </button>
+
+    <p id="couponStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📋 Daily Tasks</h3>
+
+    <button onclick="claimTaskReward()">
+        Complete Task
+    </button>
+
+    <p id="taskStatus"></p>
+</div>
+
+<div class="card">
+    <h3>👥 Referral History</h3>
+
+    <div id="referralHistory"></div>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Coupon System (Demo)
+window.redeemCoupon = async()=>{
+
+const code =
+document.getElementById("couponCode").value.trim();
+
+if(code==="WELCOME100"){
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(100)
+}
+);
+
+document.getElementById("couponStatus").innerHTML =
+"✅ 100 টাকা যোগ হয়েছে";
+
+}else{
+
+document.getElementById("couponStatus").innerHTML =
+"❌ Invalid Coupon";
+
+}
+
+};
+
+// Daily Task Reward
+window.claimTaskReward = async()=>{
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(10)
+}
+);
+
+document.getElementById("taskStatus").innerHTML =
+"🎉 10 টাকা Reward যোগ হয়েছে";
+
+};
+
+// Referral History
+async function loadReferralHistory(){
+
+const snap =
+await getDocs(
+collection(db,"users",auth.currentUser.uid,"referrals")
+);
+
+let html="";
+
+snap.forEach(item=>{
+
+const d=item.data();
+
+html += `
+<div class="card">
+👤 ${d.name}<br>
+📅 ${d.joinDate || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("referralHistory").innerHTML =
+html;
+
+}
+
+loadReferralHistory();
+    users
+ └── uid
+      ├── balance
+      ├── referrals
+      └── referrals/
+           └── documentId
+                ├── name
+                └── joinDate
+
+coupons
+ └── couponId
+      ├── code
+      ├── reward
+      └── active
+    <div class="card">
+    <h3>🏆 User Level</h3>
+
+    <p id="userLevel">Level 1</p>
+
+    <button onclick="checkLevel()">
+        Check Level
+    </button>
+</div>
+
+<div class="card">
+    <h3>🥇 Achievement Badge</h3>
+
+    <p id="achievementBadge">
+        No Badge
+    </p>
+</div>
+
+<div class="card">
+    <h3>📜 Reward History</h3>
+
+    <div id="rewardHistory"></div>
+</div>
+import {
+collection,
+getDocs,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Check User Level
+window.checkLevel = async()=>{
+
+const snap =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+if(!snap.exists()) return;
+
+const user = snap.data();
+
+const points = user.points || 0;
+
+let level = 1;
+let badge = "🥉 Beginner";
+
+if(points >= 100){
+    level = 2;
+    badge = "🥈 Silver";
+}
+
+if(points >= 500){
+    level = 3;
+    badge = "🥇 Gold";
+}
+
+if(points >= 1000){
+    level = 4;
+    badge = "💎 Diamond";
+}
+
+document.getElementById("userLevel").innerHTML =
+"Level " + level;
+
+document.getElementById("achievementBadge").innerHTML =
+badge;
+
+};
+
+// Reward History
+async function loadRewardHistory(){
+
+const snap =
+await getDocs(
+collection(db,"users",auth.currentUser.uid,"rewardHistory")
+);
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+🎁 ${d.reward}<br>
+💰 ${d.amount} টাকা<br>
+📅 ${d.date || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("rewardHistory").innerHTML =
+html;
+
+}
+
+checkLevel();
+loadRewardHistory();
+    users
+ └── uid
+      ├── points
+      ├── balance
+      ├── level
+
+      └── rewardHistory
+           └── documentId
+                ├── reward
+                ├── amount
+                └── date
+    <div class="card">
+    <h3>👑 VIP Membership</h3>
+
+    <p id="vipStatus">Standard User</p>
+
+    <button onclick="upgradeVIP()">
+        Upgrade to VIP
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 Reward Store</h3>
+
+    <button onclick="redeemReward(100)">
+        Redeem 100 Points
+    </button>
+
+    <button onclick="redeemReward(500)">
+        Redeem 500 Points
+    </button>
+
+    <p id="redeemStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📜 Redeem History</h3>
+
+    <div id="redeemHistory"></div>
+                          </div>
+                          import {
+doc,
+getDoc,
+updateDoc,
+collection,
+addDoc,
+getDocs,
+serverTimestamp,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Upgrade VIP
+window.upgradeVIP = async()=>{
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+vip:true
+}
+);
+
+document.getElementById("vipStatus").innerHTML =
+"👑 VIP Member";
+
+};
+
+// Redeem Reward
+window.redeemReward = async(points)=>{
+
+const userRef = doc(db,"users",auth.currentUser.uid);
+
+const snap = await getDoc(userRef);
+
+if(!snap.exists()) return;
+
+const user = snap.data();
+
+if((user.points || 0) < points){
+
+document.getElementById("redeemStatus").innerHTML =
+"❌ পর্যাপ্ত পয়েন্ট নেই";
+
+return;
+
+}
+
+await updateDoc(userRef,{
+points:increment(-points)
+});
+
+await addDoc(
+collection(db,"users",auth.currentUser.uid,"redeemHistory"),
+{
+points:points,
+createdAt:serverTimestamp()
+}
+);
+
+document.getElementById("redeemStatus").innerHTML =
+"✅ Reward Redeemed";
+
+loadRedeemHistory();
+
+};
+
+// Redeem History
+async function loadRedeemHistory(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"redeemHistory")
+);
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+🎁 Redeemed: ${d.points} Points<br>
+📅 ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("redeemHistory").innerHTML = html;
+
+}
+
+loadRedeemHistory();
+    users
+ └── uid
+      ├── vip
+      ├── points
+
+      └── redeemHistory
+           └── documentId
+                ├── points
+                └── createdAt
+    <div class="card">
+    <h3>🔥 Daily Streak</h3>
+
+    <p id="streakDays">0 Days</p>
+
+    <button onclick="claimStreakReward()">
+        Claim Daily Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>🏅 Achievement Rewards</h3>
+
+    <button onclick="claimAchievement()">
+        Claim Achievement
+    </button>
+
+    <p id="achievementStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📜 Claim History</h3>
+
+    <div id="claimHistory"></div>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+collection,
+addDoc,
+getDocs,
+serverTimestamp,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Streak Reward (Demo)
+window.claimStreakReward = async()=>{
+
+const userRef = doc(db,"users",auth.currentUser.uid);
+
+await updateDoc(userRef,{
+streak:increment(1),
+balance:increment(5)
+});
+
+document.getElementById("streakDays").innerHTML =
+"🔥 Reward Claimed";
+
+};
+
+// Achievement Reward (Demo)
+window.claimAchievement = async()=>{
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(20)
+}
+);
+
+document.getElementById("achievementStatus").innerHTML =
+"🏅 Achievement Reward Claimed";
+
+await addDoc(
+collection(db,"users",auth.currentUser.uid,"claimHistory"),
+{
+type:"Achievement",
+reward:20,
+createdAt:serverTimestamp()
+}
+);
+
+loadClaimHistory();
+
+};
+
+// Claim History
+async function loadClaimHistory(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"claimHistory")
+);
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+🎁 ${d.type}<br>
+💰 ${d.reward} Coins<br>
+📅 ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("claimHistory").innerHTML = html;
+
+}
+
+loadClaimHistory();
+    users
+ └── uid
+      ├── balance
+      ├── streak
+
+      └── claimHistory
+           └── documentId
+                ├── type
+                ├── reward
+                └── createdAt
+    <div class="card">
+    <h3>💸 Wallet Transfer</h3>
+
+    <input
+        type="text"
+        id="receiverUid"
+        placeholder="Receiver UID">
+
+    <input
+        type="number"
+        id="transferAmount"
+        placeholder="Amount">
+
+    <button onclick="transferBalance()">
+        Transfer
+    </button>
+
+    <p id="transferStatus"></p>
+</div>
+
+<div class="card">
+    <h3>👥 Referral Commission</h3>
+
+    <p id="referralCommission">
+        0 Coins
+    </p>
+</div>
+
+<div class="card">
+    <h3>📜 Transaction History</h3>
+
+    <div id="transactionHistory"></div>
+    </div>
+    import {
+doc,
+getDoc,
+updateDoc,
+increment,
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Wallet Transfer (Demo)
+window.transferBalance = async()=>{
+
+const uid =
+document.getElementById("receiverUid").value.trim();
+
+const amount =
+Number(document.getElementById("transferAmount").value);
+
+if(!uid || amount <= 0){
+
+alert("সঠিক তথ্য দিন");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"users",uid),
+{
+balance:increment(amount)
+}
+);
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(-amount)
+}
+);
+
+await addDoc(
+collection(db,"users",auth.currentUser.uid,"transactions"),
+{
+type:"Transfer",
+amount:amount,
+receiver:uid,
+createdAt:serverTimestamp()
+}
+);
+
+document.getElementById("transferStatus").innerHTML =
+"✅ Transfer Successful";
+
+loadTransactions();
+
+};
+
+// Load Transaction History
+async function loadTransactions(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"transactions")
+);
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+💳 ${d.type}<br>
+💰 ${d.amount}<br>
+👤 ${d.receiver || "-"}<br>
+📅 ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("transactionHistory").innerHTML =
+html;
+
+}
+
+// Demo Referral Commission
+document.getElementById("referralCommission").innerHTML =
+"50 Coins";
+
+loadTransactions();
+    users
+ └── uid
+      ├── balance
+
+      └── transactions
+           └── documentId
+                ├── type
+                ├── amount
+                ├── receiver
+                └── createdAt
+    <div class="card">
+    <h3>💼 Wallet Statement</h3>
+    <div id="walletStatement"></div>
+</div>
+
+<div class="card">
+    <h3>👥 Referral Earnings</h3>
+    <p id="referralEarnings">0 Coins</p>
+</div>
+
+<div class="card">
+    <h3>💸 Withdrawal Limit</h3>
+    <p>Minimum Withdraw: <b>100 Coins</b></p>
+    <p>Maximum Withdraw: <b>5000 Coins</b></p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Wallet Statement
+async function loadWalletStatement(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"transactions")
+);
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+<b>${d.type}</b><br>
+Amount: ${d.amount}<br>
+Date: ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("walletStatement").innerHTML = html;
+
+}
+
+// Referral Earnings
+async function loadReferralEarnings(){
+
+const snap = await getDoc(
+doc(db,"users",auth.currentUser.uid)
+);
+
+if(snap.exists()){
+
+const user = snap.data();
+
+document.getElementById("referralEarnings").innerHTML =
+(user.referralEarnings || 0) + " Coins";
+
+}
+
+}
+
+loadWalletStatement();
+loadReferralEarnings();
+    users
+ └── uid
+      ├── referralEarnings
+
+      └── transactions
+           └── documentId
+                ├── type
+                ├── amount
+                └── createdAt
+    <div class="card">
+    <h3>🔐 Wallet PIN</h3>
+
+    <input
+        type="password"
+        id="walletPin"
+        maxlength="4"
+        placeholder="Enter 4-digit PIN">
+
+    <button onclick="saveWalletPin()">
+        Save PIN
+    </button>
+
+    <p id="pinStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📱 Withdrawal OTP</h3>
+
+    <button onclick="sendOTP()">
+        Send OTP
+    </button>
+
+    <input
+        type="text"
+        id="otpCode"
+        placeholder="Enter OTP">
+
+    <button onclick="verifyOTP()">
+        Verify OTP
+    </button>
+
+    <p id="otpStatus"></p>
+</div>
+
+<div class="card">
+    <h3>🛡 Security Settings</h3>
+
+    <p>Wallet Protection: <span id="securityStatus">Enabled</span></p>
+</div>
+import {
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Wallet PIN (Demo)
+window.saveWalletPin = async()=>{
+
+const pin =
+document.getElementById("walletPin").value.trim();
+
+if(pin.length !== 4){
+
+alert("Enter a 4-digit PIN");
+
+return;
+
+}
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+walletPin:pin
+}
+);
+
+document.getElementById("pinStatus").innerHTML =
+"✅ Wallet PIN Saved";
+
+};
+
+// Demo OTP
+let currentOTP = "";
+
+window.sendOTP = ()=>{
+
+currentOTP =
+Math.floor(100000 + Math.random()*900000).toString();
+
+alert("Demo OTP: " + currentOTP);
+
+};
+
+window.verifyOTP = ()=>{
+
+const otp =
+document.getElementById("otpCode").value.trim();
+
+if(otp === currentOTP){
+
+document.getElementById("otpStatus").innerHTML =
+"✅ OTP Verified";
+
+}else{
+
+document.getElementById("otpStatus").innerHTML =
+"❌ Invalid OTP";
+
+}
+
+};
+    users
+ └── uid
+      ├── walletPin
+      ├── securityEnabled
+      └── lastOtpVerification
+    <div class="card">
+    <h3>🪪 KYC Verification</h3>
+
+    <input
+        type="text"
+        id="fullName"
+        placeholder="Full Name">
+
+    <input
+        type="text"
+        id="nidNumber"
+        placeholder="NID / Passport Number">
+
+    <input
+        type="file"
+        id="kycImage"
+        accept="image/*">
+
+    <button onclick="submitKYC()">
+        Submit KYC
+    </button>
+
+    <p id="kycStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📋 Verification Status</h3>
+
+    <p id="verificationStatus">
+        Pending
+    </p>
+</div>
+import {
+doc,
+setDoc,
+getDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Submit KYC (Demo)
+window.submitKYC = async()=>{
+
+const fullName =
+document.getElementById("fullName").value.trim();
+
+const nidNumber =
+document.getElementById("nidNumber").value.trim();
+
+if(!fullName || !nidNumber){
+
+alert("সব তথ্য পূরণ করুন");
+
+return;
+
+}
+
+await setDoc(
+doc(db,"kyc",auth.currentUser.uid),
+{
+uid:auth.currentUser.uid,
+fullName,
+nidNumber,
+status:"Pending",
+submittedAt:serverTimestamp()
+},
+{merge:true}
+);
+
+document.getElementById("kycStatus").innerHTML =
+"✅ KYC Submitted";
+
+};
+
+// Load Verification Status
+async function loadKYCStatus(){
+
+const snap =
+await getDoc(doc(db,"kyc",auth.currentUser.uid));
+
+if(snap.exists()){
+
+document.getElementById("verificationStatus").innerHTML =
+snap.data().status;
+
+}
+
+}
+
+loadKYCStatus();
+    import {
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.approveKYC = async(uid)=>{
+
+await updateDoc(
+doc(db,"kyc",uid),
+{
+status:"Approved"
+}
+);
+
+alert("✅ KYC Approved");
+
+};
+
+window.rejectKYC = async(uid)=>{
+
+await updateDoc(
+doc(db,"kyc",uid),
+{
+status:"Rejected"
+}
+);
+
+alert("❌ KYC Rejected");
+
+};
+    kyc
+ └── uid
+      ├── fullName
+      ├── nidNumber
+      ├── status
+      ├── documentUrl
+      └── submittedAt
+    <div class="card">
+    <h3>🪪 Pending KYC Requests</h3>
+
+    <div id="kycList"></div>
+</div>
+
+<div class="card">
+    <h3>✅ Verification Summary</h3>
+
+    <p>Pending: <span id="pendingCount">0</span></p>
+    <p>Approved: <span id="approvedCount">0</span></p>
+    <p>Rejected: <span id="rejectedCount">0</span></p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+window.loadKYCRequests = async()=>{
+
+const snap = await getDocs(collection(db,"kyc"));
+
+let html = "";
+let pending = 0;
+let approved = 0;
+let rejected = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.status==="Pending") pending++;
+if(d.status==="Approved") approved++;
+if(d.status==="Rejected") rejected++;
+
+html += `
+<div class="card">
+<b>${d.fullName}</b><br>
+Status: ${d.status}<br><br>
+
+<button onclick="approveUser('${item.id}')">
+Approve
+</button>
+
+<button onclick="rejectUser('${item.id}')">
+Reject
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("kycList").innerHTML = html;
+document.getElementById("pendingCount").innerHTML = pending;
+document.getElementById("approvedCount").innerHTML = approved;
+document.getElementById("rejectedCount").innerHTML = rejected;
+
+};
+
+window.approveUser = async(uid)=>{
+
+await updateDoc(doc(db,"kyc",uid),{
+status:"Approved"
+});
+
+await updateDoc(doc(db,"users",uid),{
+verified:true
+});
+
+loadKYCRequests();
+
+};
+
+window.rejectUser = async(uid)=>{
+
+await updateDoc(doc(db,"kyc",uid),{
+status:"Rejected"
+});
+
+loadKYCRequests();
+
+};
+
+loadKYCRequests();
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function checkWithdrawPermission(){
+
+const snap =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+if(!snap.exists()) return;
+
+const user = snap.data();
+
+if(user.verified){
+
+document.getElementById("verifyBadge").innerHTML =
+"✅ Verified User";
+
+}else{
+
+document.getElementById("verifyBadge").innerHTML =
+"❌ Verification Required";
+
+const withdrawBtn =
+document.getElementById("withdrawButton");
+
+if(withdrawBtn){
+
+withdrawBtn.disabled = true;
+
+}
+
+}
+
+}
+    users
+ └── uid
+      ├── verified
+      ├── balance
+      ├── role
+
+kyc
+ └── uid
+      ├── fullName
+      ├── status
+      ├── documentUrl
+      └── submittedAt
+
+checkWithdrawPermission();
+    <div class="card">
+    <h3>💰 Wallet Adjustment</h3>
+
+    <input
+        type="text"
+        id="walletUid"
+        placeholder="User UID">
+
+    <input
+        type="number"
+        id="walletAmount"
+        placeholder="Amount">
+
+    <button onclick="addBalance()">
+        Add Balance
+    </button>
+
+    <button onclick="deductBalance()">
+        Deduct Balance
+    </button>
+</div>
+
+<div class="card">
+    <h3>🔒 Wallet Lock</h3>
+
+    <input
+        type="text"
+        id="lockUid"
+        placeholder="User UID">
+
+    <button onclick="lockWallet()">
+        Lock Wallet
+    </button>
+
+    <button onclick="unlockWallet()">
+        Unlock Wallet
+    </button>
+</div>
+
+<div class="card">
+    <h3>🚨 Fraud Detection</h3>
+
+    <div id="fraudAlerts">
+        No Alerts
+    </div>
+</div>
+import {
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Payment Settings
+window.savePaymentSettings = async()=>{
+
+await setDoc(doc(db,"settings","payment"),{
+
+bkash:
+document.getElementById("bkashNumber").value,
+
+nagad:
+document.getElementById("nagadNumber").value
+
+},{merge:true});
+
+alert("✅ Payment Settings Saved");
+
+};
+
+// Save Withdraw Charge
+window.saveWithdrawCharge = async()=>{
+
+await setDoc(doc(db,"settings","withdraw"),{
+
+charge:
+Number(document.getElementById("withdrawCharge").value)
+
+},{merge:true});
+
+alert("✅ Withdraw Charge Saved");
+
+};
+
+// Maintenance Mode
+window.enableMaintenance = async()=>{
+
+await setDoc(doc(db,"settings","maintenance"),{
+
+enabled:true
+
+},{merge:true});
+
+document.getElementById("maintenanceStatus").innerHTML =
+"🛠 Maintenance Enabled";
+
+};
+
+window.disableMaintenance = async()=>{
+
+await setDoc(doc(db,"settings","maintenance"),{
+
+enabled:false
+
+},{merge:true});
+
+document.getElementById("maintenanceStatus").innerHTML =
+"✅ System Online";
+
+}import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function checkMaintenance(){
+
+const snap =
+await getDoc(doc(db,"settings","maintenance"));
+
+if(snap.exists() && snap.data().enabled){
+
+document.body.innerHTML = `
+<h2 style="text-align:center;margin-top:50px;">
+🛠 System Under Maintenance
+</h2>
+`;
+
+}
+
+}
+
+checkMaintenance();
+    settings
+ ├── payment
+ │    ├── bkash
+ │    └── nagad
+
+ ├── withdraw
+ │    └── charge
+
+ └── maintenance
+      └── enabled
+    <div class="card">
+    <h3>💸 Pending Withdraw Requests</h3>
+
+    <div id="withdrawList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 Withdraw Summary</h3>
+
+    <p>Pending: <span id="pendingWithdraw">0</span></p>
+    <p>Approved: <span id="approvedWithdraw">0</span></p>
+    <p>Rejected: <span id="rejectedWithdraw">0</span></p>
+</div>
+
+<div class="card">
+    <h3>📜 Payment History</h3>
+
+    <div id="paymentHistory"></div>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Withdraw Requests
+async function loadWithdrawRequests(){
+
+const snap = await getDocs(collection(db,"withdraws"));
+
+let html = "";
+let pending = 0;
+let approved = 0;
+let rejected = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.status==="Pending") pending++;
+if(d.status==="Approved") approved++;
+if(d.status==="Rejected") rejected++;
+
+html += `
+<div class="card">
+<b>${d.userName}</b><br>
+💰 ${d.amount} টাকা<br>
+📱 ${d.method}<br>
+📞 ${d.account}<br>
+Status: ${d.status}<br><br>
+
+<button onclick="approveWithdraw('${item.id}')">
+Approve
+</button>
+
+<button onclick="rejectWithdraw('${item.id}')">
+Reject
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("withdrawList").innerHTML = html;
+document.getElementById("pendingWithdraw").innerHTML = pending;
+document.getElementById("approvedWithdraw").innerHTML = approved;
+document.getElementById("rejectedWithdraw").innerHTML = rejected;
+
+}
+
+// Approve Withdraw
+window.approveWithdraw = async(id)=>{
+
+await updateDoc(doc(db,"withdraws",id),{
+status:"Approved"
+});
+
+loadWithdrawRequests();
+
+};
+
+// Reject Withdraw
+window.rejectWithdraw = async(id)=>{
+
+await updateDoc(doc(db,"withdraws",id),{
+status:"Rejected"
+});
+
+loadWithdrawRequests();
+
+};
+
+loadWithdrawRequests();
+    withdraws
+ └── documentId
+      ├── uid
+      ├── userName
+      ├── amount
+      ├── method
+      ├── account
+      ├── status
+      ├── createdAt
+      └── paidAt
+    <div class="card">
+    <h3>💸 Withdraw Queue</h3>
+
+    <button onclick="processWithdraws()">
+        Process Pending Withdraws
+    </button>
+
+    <p id="processStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📄 Upload Payment Proof</h3>
+
+    <input
+        type="file"
+        id="paymentProof"
+        accept="image/*,.pdf">
+
+    <button onclick="uploadProof()">
+        Upload Proof
+    </button>
+
+    <p id="proofStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📜 Recent Withdraw History</h3>
+
+    <div id="withdrawHistory"></div>
+</div>
+import {
+collection,
+getDocs,
+updateDoc,
+doc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Process Pending Withdraws
+window.processWithdraws = async()=>{
+
+const snap = await getDocs(collection(db,"withdraws"));
+
+let total = 0;
+
+for(const item of snap.docs){
+
+const d = item.data();
+
+if(d.status==="Pending"){
+
+await updateDoc(doc(db,"withdraws",item.id),{
+
+status:"Approved",
+
+paidAt:serverTimestamp()
+
+});
+
+total++;
+
+}
+
+}
+
+document.getElementById("processStatus").innerHTML =
+"✅ " + total + " Withdraw Processed";
+
+loadWithdrawHistory();
+
+};
+
+// Demo Upload Proof
+window.uploadProof = ()=>{
+
+const file =
+document.getElementById("paymentProof").files[0];
+
+if(!file){
+
+alert("Select a file");
+
+return;
+
+}
+
+document.getElementById("proofStatus").innerHTML =
+"✅ Payment Proof Uploaded (Demo)";
+
+};
+
+// Withdraw History
+async function loadWithdrawHistory(){
+
+const snap = await getDocs(collection(db,"withdraws"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+👤 ${d.userName}<br>
+💰 ${d.amount} টাকা<br>
+📌 ${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("withdrawHistory").innerHTML =
+html;
+
+}
+
+loadWithdrawHistory();
+    withdraws
+ └── documentId
+      ├── uid
+      ├── amount
+      ├── method
+      ├── account
+      ├── status
+      ├── proofUrl
+      ├── createdAt
+      └── paidAt
+    <div class="card">
+    <h3>📊 Dashboard Analytics</h3>
+
+    <p>Total Users: <span id="totalUsers">0</span></p>
+    <p>Total Withdraws: <span id="totalWithdraws">0</span></p>
+    <p>Total Revenue: <span id="totalRevenue">0</span></p>
+</div>
+
+<div class="card">
+    <h3>📈 Revenue Report</h3>
+
+    <button onclick="loadRevenueReport()">
+        Refresh Report
+    </button>
+
+    <div id="reportResult"></div>
+</div>
+
+<div class="card">
+    <h3>📄 Export Report</h3>
+
+    <button onclick="exportReport()">
+        Export CSV
+    </button>
+
+    <p id="exportStatus"></p>
+    </div>
+    import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Dashboard Analytics
+async function loadDashboard(){
+
+const users =
+await getDocs(collection(db,"users"));
+
+const withdraws =
+await getDocs(collection(db,"withdraws"));
+
+document.getElementById("totalUsers").innerHTML =
+users.size;
+
+document.getElementById("totalWithdraws").innerHTML =
+withdraws.size;
+
+let revenue = 0;
+
+withdraws.forEach(item=>{
+
+const d = item.data();
+
+if(d.status==="Approved"){
+
+revenue += Number(d.amount || 0);
+
+}
+
+});
+
+document.getElementById("totalRevenue").innerHTML =
+revenue + " Coins";
+
+}
+
+// Revenue Report
+window.loadRevenueReport = ()=>{
+
+document.getElementById("reportResult").innerHTML = `
+✅ Report Generated<br>
+Today Revenue Loaded
+`;
+
+};
+
+// Export CSV (Demo)
+window.exportReport = ()=>{
+
+document.getElementById("exportStatus").innerHTML =
+"✅ CSV Export Ready (Demo)";
+
+};
+
+loadDashboard();
+    users
+ └── uid
+
+withdraws
+ └── documentId
+      ├── amount
+      ├── status
+      └── createdAt
+    <div class="card">
+    <h3>👥 User Management</h3>
+
+    <div id="userList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 User Statistics</h3>
+
+    <p>Total Users: <span id="userCount">0</span></p>
+    <p>Banned Users: <span id="bannedCount">0</span></p>
+    <p>Active Users: <span id="activeCount">0</span></p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc,
+deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Users
+async function loadUsers(){
+
+const snap = await getDocs(collection(db,"users"));
+
+let html = "";
+let banned = 0;
+let active = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.banned){
+    banned++;
+}else{
+    active++;
+}
+
+html += `
+<div class="card">
+<b>${d.name || "User"}</b><br>
+📧 ${d.email || "-"}<br>
+🚫 ${d.banned ? "Banned" : "Active"}<br><br>
+
+<button onclick="banUser('${item.id}')">
+Ban
+</button>
+
+<button onclick="unbanUser('${item.id}')">
+Unban
+</button>
+
+<button onclick="deleteUser('${item.id}')">
+Delete
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("userList").innerHTML = html;
+document.getElementById("userCount").innerHTML = snap.size;
+document.getElementById("bannedCount").innerHTML = banned;
+document.getElementById("activeCount").innerHTML = active;
+
+}
+
+// Ban User
+window.banUser = async(uid)=>{
+
+await updateDoc(doc(db,"users",uid),{
+banned:true
+});
+
+loadUsers();
+
+};
+
+// Unban User
+window.unbanUser = async(uid)=>{
+
+await updateDoc(doc(db,"users",uid),{
+banned:false
+});
+
+loadUsers();
+
+};
+
+// Delete User (Demo)
+window.deleteUser = async(uid)=>{
+
+if(!confirm("Delete this user?")) return;
+
+await deleteDoc(doc(db,"users",uid));
+
+loadUsers();
+
+};
+
+loadUsers();
+    users
+ └── uid
+      ├── name
+      ├── email
+      ├── banned
+      ├── verified
+      ├── balance
+      └── createdAt
+    <div class="card">
+    <h3>🎫 Support Tickets</h3>
+
+    <div id="ticketList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 Ticket Statistics</h3>
+
+    <p>Open: <span id="openTickets">0</span></p>
+    <p>Closed: <span id="closedTickets">0</span></p>
+</div><div class="card">
+    <h3>🎫 Support Tickets</h3>
+
+    <div id="ticketList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 Ticket Statistics</h3>
+
+    <p>Open: <span id="openTickets">0</span></p>
+    <p>Closed: <span id="closedTickets">0</span></p>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Tickets
+async function loadTickets(){
+
+const snap = await getDocs(collection(db,"supportTickets"));
+
+let html = "";
+let open = 0;
+let closed = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.status==="Open"){
+    open++;
+}else{
+    closed++;
+}
+
+html += `
+<div class="card">
+<b>${d.subject}</b><br>
+👤 ${d.userName}<br>
+💬 ${d.message}<br>
+📌 ${d.status}<br><br>
+
+<button onclick="replyTicket('${item.id}')">
+Reply
+</button>
+
+<button onclick="closeTicket('${item.id}')">
+Close
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("ticketList").innerHTML = html;
+document.getElementById("openTickets").innerHTML = open;
+document.getElementById("closedTickets").innerHTML = closed;
+
+}
+
+// Reply Ticket (Demo)
+window.replyTicket = async(id)=>{
+
+const reply = prompt("Enter Reply");
+
+if(!reply) return;
+
+await updateDoc(doc(db,"supportTickets",id),{
+
+adminReply:reply
+
+});
+
+alert("✅ Reply Sent");
+
+loadTickets();
+
+};
+
+// Close Ticket
+window.closeTicket = async(id)=>{
+
+await updateDoc(doc(db,"supportTickets",id),{
+
+status:"Closed"
+
+});
+
+alert("✅ Ticket Closed");
+
+loadTickets();
+
+};
+
+loadTickets();
+    <div class="card">
+    <h3>📩 My Support Tickets</h3>
+
+    <div id="myTickets"></div>
+    </div>
+    supportTickets
+ └── documentId
+      ├── uid
+      ├── userName
+      ├── subject
+      ├── message
+      ├── adminReply
+      ├── status
+      └── createdAt
+    <div class="card">
+    <h3>🔔 Send Notification</h3>
+
+    <input
+        type="text"
+        id="notificationTitle"
+        placeholder="Notification Title">
+
+    <textarea
+        id="notificationBody"
+        placeholder="Notification Message"></textarea>
+
+    <button onclick="sendNotification()">
+        Send Notification
+    </button>
+</div>
+
+<div class="card">
+    <h3>📧 Send Email (Demo)</h3>
+
+    <input
+        type="email"
+        id="emailAddress"
+        placeholder="User Email">
+
+    <button onclick="sendEmailDemo()">
+        Send Email
+    </button>
+</div>
+
+<div class="card">
+    <h3>📜 Notification History</h3>
+
+    <div id="notificationHistory"></div>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Send Notification
+window.sendNotification = async()=>{
+
+const title =
+document.getElementById("notificationTitle").value.trim();
+
+const body =
+document.getElementById("notificationBody").value.trim();
+
+if(!title || !body){
+
+alert("সব তথ্য পূরণ করুন");
+
+return;
+
+}
+
+await addDoc(collection(db,"notifications"),{
+
+title,
+body,
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Notification Sent");
+
+loadNotificationHistory();
+
+};
+
+// Demo Email
+window.sendEmailDemo = ()=>{
+
+const email =
+document.getElementById("emailAddress").value;
+
+alert("📧 Email sent to: " + email + " (Demo)");
+
+};
+
+// Notification History
+async function loadNotificationHistory(){
+
+const snap = await getDocs(collection(db,"notifications"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+${d.body}<br>
+📅 ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("notificationHistory").innerHTML = html;
+
+}
+
+loadNotificationHistory();
+    notifications
+ └── documentId
+      ├── title
+      ├── body
+      ├── createdAt
+      └── sentBy
+    <div class="card">
+    <h3>📦 App Version</h3>
+
+    <input
+        type="text"
+        id="appVersion"
+        placeholder="e.g. 1.0.1">
+
+    <button onclick="saveAppVersion()">
+        Save Version
+    </button>
+</div>
+
+<div class="card">
+    <h3>🚨 Force Update</h3>
+
+    <button onclick="enableForceUpdate()">
+        Enable
+    </button>
+
+    <button onclick="disableForceUpdate()">
+        Disable
+    </button>
+
+    <p id="updateStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📢 Maintenance Notice</h3>
+
+    <textarea
+        id="maintenanceNotice"
+        placeholder="Enter maintenance message"></textarea>
+
+    <button onclick="saveNotice()">
+        Save Notice
+    </button>
+</div>
+import {
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save App Version
+window.saveAppVersion = async()=>{
+
+const version =
+document.getElementById("appVersion").value.trim();
+
+await setDoc(doc(db,"settings","appVersion"),{
+version:version
+},{merge:true});
+
+alert("✅ App Version Saved");
+
+};
+
+// Force Update
+window.enableForceUpdate = async()=>{
+
+await setDoc(doc(db,"settings","appVersion"),{
+forceUpdate:true
+},{merge:true});
+
+document.getElementById("updateStatus").innerHTML =
+"🚨 Force Update Enabled";
+
+};
+
+window.disableForceUpdate = async()=>{
+
+await setDoc(doc(db,"settings","appVersion"),{
+forceUpdate:false
+},{merge:true});
+
+document.getElementById("updateStatus").innerHTML =
+"✅ Force Update Disabled";
+
+};
+
+// Maintenance Notice
+window.saveNotice = async()=>{
+
+const notice =
+document.getElementById("maintenanceNotice").value.trim();
+
+await setDoc(doc(db,"settings","maintenance"),{
+notice:notice
+},{merge:true});
+
+alert("✅ Notice Saved");
+
+};
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const CURRENT_VERSION = "1.0.0";
+
+async function checkAppVersion(){
+
+const snap =
+await getDoc(doc(db,"settings","appVersion"));
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+if(data.forceUpdate && data.version !== CURRENT_VERSION){
+
+alert("🚨 নতুন App Version উপলব্ধ। অনুগ্রহ করে আপডেট করুন।");
+
+}
+
+}
+
+checkAppVersion();
+    settings
+ ├── appVersion
+ │    ├── version
+ │    └── forceUpdate
+ │
+ └── maintenance
+      └── notice
+    <div class="card">
+    <h3>📢 Banner Advertisement</h3>
+
+    <input
+        type="text"
+        id="bannerTitle"
+        placeholder="Banner Title">
+
+    <input
+        type="text"
+        id="bannerLink"
+        placeholder="Banner Link">
+
+    <button onclick="saveBanner()">
+        Save Banner
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎯 Promo Campaign</h3>
+
+    <input
+        type="text"
+        id="promoCode"
+        placeholder="Promo Code">
+
+    <input
+        type="number"
+        id="promoReward"
+        placeholder="Reward">
+
+    <button onclick="createPromo()">
+        Create Promo
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 Campaign Status</h3>
+
+    <div id="campaignStatus"></div>
+</div>
+import {
+doc,
+setDoc,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Banner
+window.saveBanner = async()=>{
+
+const title =
+document.getElementById("bannerTitle").value.trim();
+
+const link =
+document.getElementById("bannerLink").value.trim();
+
+await setDoc(doc(db,"settings","banner"),{
+
+title,
+link
+
+},{merge:true});
+
+alert("✅ Banner Saved");
+
+};
+
+// Create Promo Campaign
+window.createPromo = async()=>{
+
+const code =
+document.getElementById("promoCode").value.trim();
+
+const reward =
+Number(document.getElementById("promoReward").value);
+
+await addDoc(collection(db,"promotions"),{
+
+code,
+reward,
+active:true,
+createdAt:serverTimestamp()
+
+});
+
+document.getElementById("campaignStatus").innerHTML =
+"✅ Promo Campaign Created";
+
+};
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Banner
+async function loadBanner(){
+
+const snap =
+await getDoc(doc(db,"settings","banner"));
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+document.getElementById("bannerArea").innerHTML = `
+<a href="${data.link}" target="_blank">
+${data.title}
+</a>
+`;
+
+}
+
+loadBanner();
+    settings
+ └── banner
+      ├── title
+      └── link
+
+promotions
+ └── documentId
+      ├── code
+      ├── reward
+      ├── active
+      └── createdAt
+    <div class="card">
+    <h3>👥 Referral Settings</h3>
+
+    <input
+        type="number"
+        id="referralBonus"
+        placeholder="Referral Bonus">
+
+    <button onclick="saveReferralBonus()">
+        Save Bonus
+    </button>
+</div>
+
+<div class="card">
+    <h3>💰 Commission Rate</h3>
+
+    <input
+        type="number"
+        id="commissionRate"
+        placeholder="Commission %">
+
+    <button onclick="saveCommissionRate()">
+        Save Commission
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 Referral Analytics</h3>
+
+    <p>Total Referrals: <span id="totalReferrals">0</span></p>
+    <p>Total Commission: <span id="totalCommission">0</span></p>
+</div>
+import {
+doc,
+setDoc,
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Referral Bonus
+window.saveReferralBonus = async()=>{
+
+const bonus = Number(
+document.getElementById("referralBonus").value
+);
+
+await setDoc(doc(db,"settings","referral"),{
+
+bonus
+
+},{merge:true});
+
+alert("✅ Referral Bonus Saved");
+
+};
+
+// Save Commission Rate
+window.saveCommissionRate = async()=>{
+
+const rate = Number(
+document.getElementById("commissionRate").value
+);
+
+await setDoc(doc(db,"settings","referral"),{
+
+commissionRate:rate
+
+},{merge:true});
+
+alert("✅ Commission Rate Saved");
+
+};
+
+// Load Analytics
+async function loadReferralAnalytics(){
+
+const snap =
+await getDocs(collection(db,"users"));
+
+let referrals = 0;
+let commission = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+referrals += d.referrals || 0;
+commission += d.referralEarnings || 0;
+
+});
+
+document.getElementById("totalReferrals").innerHTML =
+referrals;
+
+document.getElementById("totalCommission").innerHTML =
+commission + " Coins";
+
+}
+
+loadReferralAnalytics();
+    import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadReferralSettings(){
+
+const snap =
+await getDoc(doc(db,"settings","referral"));
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+console.log("Referral Bonus:", data.bonus);
+console.log("Commission Rate:", data.commissionRate);
+
+}
+
+loadReferralSettings();
+    settings
+ └── referral
+      ├── bonus
+      └── commissionRate
+
+users
+ └── uid
+      ├── referrals
+      └── referralEarnings
+    <div class="card">
+    <h3>📋 Pending Tasks</h3>
+
+    <div id="taskList"></div>
+</div>
+
+<div class="card">
+    <h3>📊 Task Statistics</h3>
+
+    <p>Pending: <span id="pendingTasks">0</span></p>
+    <p>Approved: <span id="approvedTasks">0</span></p>
+    <p>Rejected: <span id="rejectedTasks">0</span></p>
+</div>
+
+<div class="card">
+    <h3>🎁 Task Reward Settings</h3>
+
+    <input
+        type="number"
+        id="taskReward"
+        placeholder="Reward Amount">
+
+    <button onclick="saveTaskReward()">
+        Save Reward
+        import {
+collection,
+getDocs,
+doc,
+updateDoc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Tasks
+async function loadTasks(){
+
+const snap = await getDocs(collection(db,"tasks"));
+
+let html = "";
+let pending = 0;
+let approved = 0;
+let rejected = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.status==="Pending") pending++;
+if(d.status==="Approved") approved++;
+if(d.status==="Rejected") rejected++;
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+👤 ${d.userName}<br>
+📌 ${d.status}<br><br>
+
+<button onclick="approveTask('${item.id}')">
+Approve
+</button>
+
+<button onclick="rejectTask('${item.id}')">
+Reject
+</button>
+</div>
+`;
+
+});
+
+document.getElementById("taskList").innerHTML = html;
+document.getElementById("pendingTasks").innerHTML = pending;
+document.getElementById("approvedTasks").innerHTML = approved;
+document.getElementById("rejectedTasks").innerHTML = rejected;
+
+}
+
+// Approve Task
+window.approveTask = async(id)=>{
+
+await updateDoc(doc(db,"tasks",id),{
+status:"Approved"
+});
+
+loadTasks();
+
+};
+
+// Reject Task
+window.rejectTask = async(id)=>{
+
+await updateDoc(doc(db,"tasks",id),{
+status:"Rejected"
+});
+
+loadTasks();
+
+};
+
+// Save Reward
+window.saveTaskReward = async()=>{
+
+const reward = Number(
+document.getElementById("taskReward").value
+);
+
+await setDoc(doc(db,"settings","task"),{
+
+reward
+
+},{merge:true});
+
+alert("✅ Task Reward Saved");
+
+};
+
+loadTasks();
+        tasks
+ └── documentId
+      ├── uid
+      ├── userName
+      ├── title
+      ├── status
+      ├── createdAt
+
+settings
+ └── task
+      └── reward
+        <div class="card">
+    <h3>📢 Advertisement Tasks</h3>
+
+    <div id="adTaskList"></div>
+</div>
+
+<div class="card">
+    <h3>📂 Task Categories</h3>
+
+    <select id="taskCategory">
+        <option value="YouTube">YouTube</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Telegram">Telegram</option>
+        <option value="Website">Website Visit</option>
+    </select>
+
+    <button onclick="saveCategory()">
+        Save Category
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 Reward Analytics</h3>
+
+    <p>Total Rewards: <span id="rewardTotal">0</span></p>
+    <p>Completed Tasks: <span id="completedTasks">0</span></p>
+</div>
+    </button>
+</div>
+import {
+collection,
+getDocs,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Advertisement Tasks
+async function loadAdTasks(){
+
+const snap = await getDocs(collection(db,"adTasks"));
+
+let html = "";
+let rewards = 0;
+let completed = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.completed){
+completed++;
+}
+
+rewards += Number(d.reward || 0);
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+Reward: ${d.reward} Coins<br>
+Status: ${d.completed ? "Completed" : "Pending"}
+</div>
+`;
+
+});
+
+document.getElementById("adTaskList").innerHTML = html;
+document.getElementById("rewardTotal").innerHTML = rewards;
+document.getElementById("completedTasks").innerHTML = completed;
+
+}
+
+// Save Category
+window.saveCategory = async()=>{
+
+const category =
+document.getElementById("taskCategory").value;
+
+await setDoc(doc(db,"settings","taskCategory"),{
+
+defaultCategory:category
+
+},{merge:true});
+
+alert("✅ Category Saved");
+
+};
+
+loadAdTasks();
+    adTasks
+ └── documentId
+      ├── title
+      ├── category
+      ├── reward
+      ├── completed
+      └── createdAt
+
+settings
+ └── taskCategory
+      └── defaultCategory
+    <div class="card">
+    <h3>🎁 Daily Bonus Settings</h3>
+
+    <input
+        type="number"
+        id="dailyBonus"
+        placeholder="Daily Bonus Coins">
+
+    <button onclick="saveDailyBonus()">
+        Save Bonus
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎡 Spin Reward Settings</h3>
+
+    <input
+        type="number"
+        id="spinReward"
+        placeholder="Spin Reward Coins">
+
+    <button onclick="saveSpinReward()">
+        Save Spin Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 Bonus Analytics</h3>
+
+    <p>Total Daily Claims: <span id="dailyClaims">0</span></p>
+    <p>Total Spin Rewards: <span id="spinClaims">0</span></p>
+</div>
+import {
+doc,
+setDoc,
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Save Daily Bonus
+window.saveDailyBonus = async()=>{
+
+const bonus = Number(
+document.getElementById("dailyBonus").value
+);
+
+await setDoc(doc(db,"settings","dailyBonus"),{
+bonus
+},{merge:true});
+
+alert("✅ Daily Bonus Saved");
+
+};
+
+// Save Spin Reward
+window.saveSpinReward = async()=>{
+
+const reward = Number(
+document.getElementById("spinReward").value
+);
+
+await setDoc(doc(db,"settings","spinReward"),{
+reward
+},{merge:true});
+
+alert("✅ Spin Reward Saved");
+
+};
+
+// Load Bonus Analytics
+async function loadBonusAnalytics(){
+
+const users = await getDocs(collection(db,"users"));
+
+let daily = 0;
+let spin = 0;
+
+users.forEach(user=>{
+
+const data = user.data();
+
+daily += data.dailyClaimCount || 0;
+spin += data.spinCount || 0;
+
+});
+
+document.getElementById("dailyClaims").innerHTML = daily;
+document.getElementById("spinClaims").innerHTML = spin;
+
+}
+
+loadBonusAnalytics();
+    settings
+ ├── dailyBonus
+ │    └── bonus
+ │
+ └── spinReward
+      └── reward
+
+users
+ └── uid
+      ├── dailyClaimCount
+      └── spinCount
+    <div class="card">
+    <h3>🏆 Top Earners</h3>
+
+    <div id="leaderboard"></div>
+</div>
+
+<div class="card">
+    <h3>📅 Monthly Ranking</h3>
+
+    <div id="monthlyRanking"></div>
+</div>
+
+<div class="card">
+    <h3>📊 Leaderboard Statistics</h3>
+
+    <p>Total Ranked Users: <span id="rankedUsers">0</span></p>
+    <p>Highest Balance: <span id="highestBalance">0</span></p>
+</div>
+import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadLeaderboard(){
+
+const snap = await getDocs(collection(db,"users"));
+
+let users = [];
+
+snap.forEach(docItem=>{
+
+const d = docItem.data();
+
+users.push({
+name:d.name || "User",
+balance:d.balance || 0
+});
+
+});
+
+// Sort by balance
+users.sort((a,b)=>b.balance-a.balance);
+
+let leaderboardHTML = "";
+let monthlyHTML = "";
+
+users.forEach((user,index)=>{
+
+leaderboardHTML += `
+<div class="card">
+🏅 #${index+1}<br>
+👤 ${user.name}<br>
+💰 ${user.balance} Coins
+</div>
+`;
+
+if(index < 10){
+
+monthlyHTML += `
+<div>
+${index+1}. ${user.name} - ${user.balance} Coins
+</div>
+`;
+
+}
+
+});
+
+document.getElementById("leaderboard").innerHTML =
+leaderboardHTML;
+
+document.getElementById("monthlyRanking").innerHTML =
+monthlyHTML;
+
+document.getElementById("rankedUsers").innerHTML =
+users.length;
+
+document.getElementById("highestBalance").innerHTML =
+users.length ? users[0].balance : 0;
+
+}
+
+loadLeaderboard();
+    users
+ └── uid
+      ├── name
+      ├── balance
+      ├── monthlyEarnings
+      └── createdAt
+    <div class="card">
+    <h3>🎟 Create Coupon</h3>
+
+    <input
+        type="text"
+        id="couponCode"
+        placeholder="Coupon Code">
+
+    <input
+        type="number"
+        id="couponReward"
+        placeholder="Reward Coins">
+
+    <button onclick="createCoupon()">
+        Create Coupon
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 Coupon Analytics</h3>
+
+    <p>Total Coupons: <span id="totalCoupons">0</span></p>
+    <p>Total Redeemed: <span id="totalRedeemed">0</span></p>
+</div>
+<div class="card">
+    <h3>🎁 Redeem Coupon</h3>
+
+    <input
+        type="text"
+        id="redeemCode"
+        placeholder="Enter Coupon Code">
+
+    <button onclick="redeemCoupon()">
+        Redeem
+    </button>
+
+    <p id="redeemStatus"></p>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Create Coupon
+window.createCoupon = async()=>{
+
+const code =
+document.getElementById("couponCode").value.trim().toUpperCase();
+
+const reward =
+Number(document.getElementById("couponReward").value);
+
+await addDoc(collection(db,"coupons"),{
+
+code,
+reward,
+active:true,
+redeemed:0,
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Coupon Created");
+
+loadCouponAnalytics();
+
+};
+
+// Coupon Analytics
+async function loadCouponAnalytics(){
+
+const snap = await getDocs(collection(db,"coupons"));
+
+let total = 0;
+let redeemed = 0;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+total++;
+
+redeemed += d.redeemed || 0;
+
+});
+
+document.getElementById("totalCoupons").innerHTML = total;
+document.getElementById("totalRedeemed").innerHTML = redeemed;
+
+}
+
+loadCouponAnalytics();
+    import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Demo Coupon Redeem
+window.redeemCoupon = async()=>{
+
+const code =
+document.getElementById("redeemCode").value.trim().toUpperCase();
+
+const snap = await getDocs(collection(db,"coupons"));
+
+let found = false;
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+if(d.code === code && d.active){
+
+found = true;
+
+}
+
+});
+
+document.getElementById("redeemStatus").innerHTML =
+found
+? "✅ Coupon Redeemed Successfully"
+: "❌ Invalid Coupon";
+
+};
+    coupons
+ └── documentId
+      ├── code
+      ├── reward
+      ├── active
+      ├── redeemed
+      └── createdAt
+    <div class="card">
+    <h3>📋 Admin Audit Log</h3>
+
+    <div id="auditLog"></div>
+</div>
+
+<div class="card">
+    <h3>📊 System Monitoring</h3>
+
+    <p>Total Admin Actions: <span id="adminActions">0</span></p>
+    <p>Last Activity: <span id="lastActivity">-</span></p>
+</div>
+
+<div class="card">
+    <h3>🖥 System Status</h3>
+
+    <p id="systemStatus">🟢 Online</p>
+</div>
+import {
+collection,
+getDocs,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Add Audit Log
+window.addAuditLog = async(action)=>{
+
+await addDoc(collection(db,"auditLogs"),{
+
+action,
+adminUid: auth.currentUser.uid,
+createdAt: serverTimestamp()
+
+});
+
+};
+
+// Load Audit Logs
+async function loadAuditLogs(){
+
+const snap = await getDocs(collection(db,"auditLogs"));
+
+let html = "";
+let total = 0;
+let last = "-";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+total++;
+
+last = d.createdAt?.toDate?.().toLocaleString() || "-";
+
+html += `
+<div class="card">
+<b>${d.action}</b><br>
+👤 ${d.adminUid}<br>
+📅 ${last}
+</div>
+`;
+
+});
+
+document.getElementById("auditLog").innerHTML = html;
+document.getElementById("adminActions").innerHTML = total;
+document.getElementById("lastActivity").innerHTML = last;
+
+}
+
+loadAuditLogs();
+    auditLogs
+ └── documentId
+      ├── adminUid
+      ├── action
+      └── createdAt
+    <div class="card">
+    <h3>💾 Database Backup</h3>
+
+    <button onclick="createBackup()">
+        Create Backup
+    </button>
+
+    <p id="backupStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📂 Restore Database</h3>
+
+    <input
+        type="file"
+        id="backupFile"
+        accept=".json">
+
+    <button onclick="restoreBackup()">
+        Restore
+    </button>
+
+    <p id="restoreStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📋 Backup History</h3>
+
+    <div id="backupHistory"></div>
+    </div>
+    import {
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Create Backup (Demo)
+window.createBackup = async()=>{
+
+await addDoc(collection(db,"backups"),{
+
+type:"Manual Backup",
+createdAt:serverTimestamp(),
+createdBy:auth.currentUser.uid
+
+});
+
+document.getElementById("backupStatus").innerHTML =
+"✅ Backup Created";
+
+loadBackupHistory();
+
+};
+
+// Restore Backup (Demo)
+window.restoreBackup = ()=>{
+
+const file =
+document.getElementById("backupFile").files[0];
+
+if(!file){
+
+alert("Please select a backup file");
+
+return;
+
+}
+
+document.getElementById("restoreStatus").innerHTML =
+"✅ Backup Restored (Demo)";
+
+};
+
+// Load Backup History
+async function loadBackupHistory(){
+
+const snap = await getDocs(collection(db,"backups"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+💾 ${d.type}<br>
+👤 ${d.createdBy}<br>
+📅 ${d.createdAt?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("backupHistory").innerHTML = html;
+
+}
+
+loadBackupHistory();
+    backups
+ └── documentId
+      ├── type
+      ├── createdBy
+      ├── createdAt
+      └── fileUrl
+    <div class="card">
+    <h3>👨‍💼 Admin Role Management</h3>
+
+    <input
+        type="text"
+        id="userUid"
+        placeholder="User UID">
+
+    <select id="userRole">
+        <option value="user">User</option>
+        <option value="moderator">Moderator</option>
+        <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="updateUserRole()">
+        Update Role
+    </button>
+</div>
+
+<div class="card">
+    <h3>🔐 Permission Settings</h3>
+
+    <label>
+        <input type="checkbox" id="canWithdraw">
+        Allow Withdraw
+    </label><br>
+
+    <label>
+        <input type="checkbox" id="canCreateTask">
+        Allow Create Task
+    </label><br>
+
+    <button onclick="savePermissions()">
+        Save Permissions
+    </button>
+</div>
+
+<div class="card">
+    <h3>📋 Login Activity</h3>
+
+    <div id="loginActivity"></div>
+</div>
+import {
+doc,
+updateDoc,
+setDoc,
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Update User Role
+window.updateUserRole = async()=>{
+
+const uid =
+document.getElementById("userUid").value.trim();
+
+const role =
+document.getElementById("userRole").value;
+
+await updateDoc(doc(db,"users",uid),{
+role:role
+});
+
+alert("✅ User Role Updated");
+
+};
+
+// Save Permissions
+window.savePermissions = async()=>{
+
+await setDoc(doc(db,"settings","permissions"),{
+
+canWithdraw:
+document.getElementById("canWithdraw").checked,
+
+canCreateTask:
+document.getElementById("canCreateTask").checked
+
+},{merge:true});
+
+alert("✅ Permissions Saved");
+
+};
+
+// Load Login Activity
+async function loadLoginActivity(){
+
+const snap =
+await getDocs(collection(db,"loginLogs"));
+
+let html = "";
+
+snap.forEach(item=>{
+
+const d = item.data();
+
+html += `
+<div class="card">
+👤 ${d.userName}<br>
+🕒 ${d.loginTime?.toDate?.().toLocaleString() || "-"}
+</div>
+`;
+
+});
+
+document.getElementById("loginActivity").innerHTML =
+html;
+
+}
+
+loadLoginActivity();
+    users
+ └── uid
+      ├── role
+      └── permissions
+
+settings
+ └── permissions
+      ├── canWithdraw
+      └── canCreateTask
+
+loginLogs
+ └── documentId
+      ├── uid
+      ├── userName
+      ├── loginTime
+      └── device
+    <div class="card">
+    <h3>🛡 Super Admin Panel</h3>
+
+    <button onclick="lockSystem()">
+        Lock System
+    </button>
+
+    <button onclick="unlockSystem()">
+        Unlock System
+    </button>
+
+    <p id="systemLockStatus">
+        System Online
+    </p>
+</div>
+
+<div class="card">
+    <h3>⚙ Global Settings</h3>
+
+    <label>
+        <input type="checkbox" id="registrationEnabled">
+        Allow New Registration
+    </label>
+
+    <br><br>
+
+    <label>
+        <input type="checkbox" id="withdrawEnabled">
+        Allow Withdraw
+    </label>
+
+    <br><br>
+
+    <button onclick="saveGlobalSettings()">
+        Save Settings
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 System Information</h3>
+
+    <p>Version: <span id="systemVersion">1.0.0</span></p>
+    <p>Status: <span id="systemStatus">Running</span></p>
+    </div>
+    import {
+doc,
+setDoc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Lock System
+window.lockSystem = async()=>{
+
+await setDoc(doc(db,"settings","system"),{
+
+locked:true
+
+},{merge:true});
+
+document.getElementById("systemLockStatus").innerHTML =
+"🔒 System Locked";
+
+};
+
+// Unlock System
+window.unlockSystem = async()=>{
+
+await setDoc(doc(db,"settings","system"),{
+
+locked:false
+
+},{merge:true});
+
+document.getElementById("systemLockStatus").innerHTML =
+"🟢 System Online";
+
+};
+
+// Save Global Settings
+window.saveGlobalSettings = async()=>{
+
+await setDoc(doc(db,"settings","global"),{
+
+registrationEnabled:
+document.getElementById("registrationEnabled").checked,
+
+withdrawEnabled:
+document.getElementById("withdrawEnabled").checked
+
+},{merge:true});
+
+alert("✅ Global Settings Saved");
+
+};
+
+// Load System Settings
+async function loadSystemSettings(){
+
+const snap =
+await getDoc(doc(db,"settings","global"));
+
+if(!snap.exists()) return;
+
+const data = snap.data();
+
+document.getElementById("registrationEnabled").checked =
+data.registrationEnabled || false;
+
+document.getElementById("withdrawEnabled").checked =
+data.withdrawEnabled || false;
+
+}
+
+loadSystemSettings();
+    settings
+ ├── system
+ │    └── locked
+ │
+ ├── global
+ │    ├── registrationEnabled
+ │    └── withdrawEnabled
+ │
+ └── appVersion
+      └── Bangla-Yeasin-Earn/
+│
+├── index.html
+├── login.html
+├── register.html
+├── dashboard.html
+├── wallet.html
+├── withdraw.html
+├── deposit.html
+├── referral.html
+├── tasks.html
+├── leaderboard.html
+├── coupon.html
+├── kyc.html
+├── support.html
+├── profile.html
+├── admin.html
+├── super-admin.html
+│
+├── css/
+├── js/
+├── images/
+├── assets/
+├── firebase/
+├── manifest.json
+├── service-worker.js
+├── firebase.json
+└── README.md
