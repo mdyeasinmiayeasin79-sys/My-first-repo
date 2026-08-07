@@ -1,4 +1,4 @@
-
+সিলেট 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3161,3 +3161,2562 @@ alert(snap.data().message);
 
 loadAppSettings();
 loadAnnouncement();
+<div class="card">
+    <h3>🎁 Referral Reward</h3>
+    <button onclick="claimReferralReward()">
+        Claim Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>🔐 Withdraw OTP</h3>
+
+    <input
+        type="text"
+        id="otp"
+        maxlength="6"
+        placeholder="Enter OTP">
+
+    <button onclick="verifyOTP()">
+        Verify OTP
+    </button>
+</div>
+import {
+doc,
+updateDoc,
+increment,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Referral Reward (Demo)
+window.claimReferralReward = async()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+
+const snap = await getDoc(ref);
+
+const data = snap.data();
+
+if((data.totalReferral || 0) < 5){
+
+alert("কমপক্ষে ৫টি Referral প্রয়োজন");
+
+return;
+
+}
+
+await updateDoc(ref,{
+
+balance:increment(50)
+
+});
+
+alert("🎉 ৫০ টাকা Referral Reward যোগ হয়েছে");
+
+};
+
+// OTP Verify (Demo)
+window.verifyOTP = ()=>{
+
+const otp =
+document.getElementById("otp").value;
+
+if(otp === "123456"){
+
+alert("✅ OTP Verified");
+
+}else{
+
+alert("❌ ভুল OTP");
+
+}
+
+};
+    async function approveReferral(uid){
+
+await updateDoc(doc(db,"users",uid),{
+
+referralApproved:true
+
+});
+
+alert("Referral Approved");
+
+}
+    <div class="card">
+    <h3>🎁 Daily Reward</h3>
+    <button onclick="claimDailyReward()">
+        Claim Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎲 Lucky Box</h3>
+    <button onclick="openLuckyBox()">
+        Open Lucky Box
+    </button>
+</div>
+
+<div class="card">
+    <h3>🔔 My Notifications</h3>
+    <div id="myNotifications"></div>
+</div>
+import {
+doc,
+updateDoc,
+increment,
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Reward
+window.claimDailyReward = async()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+balance:increment(5)
+
+});
+
+alert("🎉 ৫ টাকা যোগ হয়েছে");
+
+};
+
+// Lucky Box
+window.openLuckyBox = async()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const rewards = [2,5,10,20];
+
+const prize =
+rewards[Math.floor(Math.random()*rewards.length)];
+
+await updateDoc(doc(db,"users",user.uid),{
+
+balance:increment(prize)
+
+});
+
+alert("🎁 Lucky Box থেকে "+prize+" টাকা পেয়েছেন");
+
+};
+
+// Load Notifications
+async function loadNotifications(){
+
+const snap =
+await getDocs(collection(db,"notifications"));
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("myNotifications").innerHTML=html;
+
+}
+
+loadNotifications();
+    await addDoc(collection(db,"notifications"),{
+
+title:"নতুন অফার",
+
+message:"আজ Daily Reward ২ গুণ!",
+
+createdAt:serverTimestamp()
+
+});
+
+    <div class="card">
+    <h3>💳 My Wallet</h3>
+
+    <p>Balance: <span id="walletBalance">0</span> টাকা</p>
+
+    <p>Total Earn: <span id="totalEarn">0</span> টাকা</p>
+
+    <p>Total Withdraw: <span id="totalWithdraw">0</span> টাকা</p>
+</div>
+
+<div class="card">
+    <h3>💸 Withdraw History</h3>
+
+    <div id="withdrawHistory"></div>
+</div>
+
+<div class="card">
+    <h3>🎁 Reward History</h3>
+
+    <div id="rewardHistory"></div>
+</div>
+import {
+doc,
+getDoc,
+collection,
+getDocs,
+query,
+where
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Wallet
+async function loadWallet(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const data = snap.data();
+
+document.getElementById("walletBalance").innerHTML =
+data.balance || 0;
+
+document.getElementById("totalEarn").innerHTML =
+data.totalEarn || 0;
+
+document.getElementById("totalWithdraw").innerHTML =
+data.totalWithdraw || 0;
+
+}
+
+// Withdraw History
+async function loadWithdrawHistory(){
+
+const user = auth.currentUser;
+
+const q = query(
+collection(db,"withdraws"),
+where("uid","==",user.uid)
+);
+
+const snapshot = await getDocs(q);
+
+let html = "";
+
+snapshot.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+${d.amount} টাকা<br>
+${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("withdrawHistory").innerHTML = html;
+
+}
+
+// Reward History
+async function loadRewardHistory(){
+
+const user = auth.currentUser;
+
+const snapshot = await getDocs(
+collection(db,"users",user.uid,"rewards")
+);
+
+let html = "";
+
+snapshot.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+${d.type}<br>
++${d.amount} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("rewardHistory").innerHTML = html;
+
+}
+
+loadWallet();
+loadWithdrawHistory();
+loadRewardHistory();
+    await updateDoc(doc(db,"users",uid),{
+
+totalWithdraw:increment(amount)
+
+});
+    <div class="card">
+    <h3>👥 Referral Dashboard</h3>
+
+    <p>Referral Code: <span id="refCode"></span></p>
+
+    <p>Total Referrals: <span id="totalReferrals">0</span></p>
+
+    <p>Referral Income: <span id="refIncome">0</span> টাকা</p>
+</div>
+
+<div class="card">
+    <h3>📈 Earnings</h3>
+
+    <canvas id="earnChart" height="180"></canvas>
+</div>
+
+<div class="card">
+    <h3>🏆 Achievement Progress</h3>
+
+    <progress id="progress" value="0" max="1000"></progress>
+
+    <p><span id="progressText">0</span>/1000 টাকা</p>
+</div>
+import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadReferralDashboard(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const data = snap.data();
+
+document.getElementById("refCode").innerHTML =
+data.referralCode || "-";
+
+document.getElementById("totalReferrals").innerHTML =
+data.totalReferral || 0;
+
+document.getElementById("refIncome").innerHTML =
+data.referralIncome || 0;
+
+document.getElementById("progress").value =
+data.totalEarn || 0;
+
+document.getElementById("progressText").innerHTML =
+data.totalEarn || 0;
+
+}
+
+loadReferralDashboard();
+    const ctx =
+document.getElementById("earnChart");
+
+new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[
+"Mon",
+"Tue",
+"Wed",
+"Thu",
+"Fri",
+"Sat",
+"Sun"
+],
+
+datasets:[{
+
+label:"Weekly Earnings",
+
+data:[
+5,
+12,
+20,
+15,
+30,
+25,
+40
+]
+
+}]
+
+}
+
+});
+    <div class="card">
+    <h3>⭐ User Level</h3>
+
+    <p>Level: <span id="userLevel">1</span></p>
+
+    <progress id="levelProgress" value="0" max="100"></progress>
+</div>
+
+<div class="card">
+    <h3>🎯 Daily Missions</h3>
+
+    <ul id="missionList">
+        <li>✅ Login করুন (+2)</li>
+        <li>⬜ Spin করুন (+5)</li>
+        <li>⬜ Referral করুন (+10)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>🎁 Reward Progress</h3>
+
+    <progress id="rewardProgress" value="0" max="10"></progress>
+
+    <button onclick="claimMissionReward()">
+        Claim Reward
+    </button>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Level
+async function loadLevel(){
+
+const user = auth.currentUser;
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+const data = snap.data();
+
+const total = data.totalEarn || 0;
+
+let level = 1;
+
+if(total >= 100) level = 2;
+if(total >= 500) level = 3;
+if(total >= 1000) level = 4;
+if(total >= 5000) level = 5;
+
+document.getElementById("userLevel").innerHTML = level;
+
+document.getElementById("levelProgress").value =
+total % 100;
+
+}
+
+// Claim Mission Reward
+window.claimMissionReward = async()=>{
+
+const user = auth.currentUser;
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+balance:increment(10)
+
+});
+
+alert("🎉 Mission Reward ১০ টাকা যোগ হয়েছে");
+
+};
+
+loadLevel();
+    users
+ ├── uid
+ │   ├── level
+ │   ├── totalEarn
+ │   ├── missionCompleted
+ │   ├── dailyMission
+ │   ├── rewardClaimed
+    <div class="card">
+    <h3>👑 VIP Membership</h3>
+
+    <p>Current VIP:
+        <span id="vipLevel">Free</span>
+    </p>
+
+    <button onclick="upgradeVIP()">
+        Upgrade VIP
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 VIP Daily Bonus</h3>
+
+    <button onclick="claimVIPBonus()">
+        Claim Bonus
+    </button>
+</div>
+
+<div class="card">
+    <h3>💎 VIP Benefits</h3>
+
+    <ul>
+        <li>VIP 1 = +5 টাকা Daily</li>
+        <li>VIP 2 = +10 টাকা Daily</li>
+        <li>VIP 3 = +20 টাকা Daily</li>
+        <li>VIP 4 = +50 টাকা Daily</li>
+    </ul>
+</div>
+<div class="card">
+    <h3>👑 VIP Membership</h3>
+
+    <p>Current VIP:
+        <span id="vipLevel">Free</span>
+    </p>
+
+    <button onclick="upgradeVIP()">
+        Upgrade VIP
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 VIP Daily Bonus</h3>
+
+    <button onclick="claimVIPBonus()">
+        Claim Bonus
+    </button>
+</div>
+
+<div class="card">
+    <h3>💎 VIP Benefits</h3>
+
+    <ul>
+        <li>VIP 1 = +5 টাকা Daily</li>
+        <li>VIP 2 = +10 টাকা Daily</li>
+        <li>VIP 3 = +20 টাকা Daily</li>
+        <li>VIP 4 = +50 টাকা Daily</li>
+    </ul>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load VIP
+async function loadVIP(){
+
+const user = auth.currentUser;
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const data = snap.data();
+
+document.getElementById("vipLevel").innerHTML =
+data.vip || "Free";
+
+}
+
+window.upgradeVIP = async()=>{
+
+const user = auth.currentUser;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+vip:"VIP 1"
+
+});
+
+alert("🎉 VIP 1 Activated");
+
+loadVIP();
+
+};
+
+window.claimVIPBonus = async()=>{
+
+const user = auth.currentUser;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const vip = snap.data().vip;
+
+let bonus = 0;
+
+if(vip=="VIP 1") bonus = 5;
+if(vip=="VIP 2") bonus = 10;
+if(vip=="VIP 3") bonus = 20;
+if(vip=="VIP 4") bonus = 50;
+
+if(bonus==0){
+
+alert("আপনি VIP নন");
+
+return;
+
+}
+
+await updateDoc(doc(db,"users",user.uid),{
+
+balance:increment(bonus)
+
+});
+
+alert("+"+bonus+" টাকা যোগ হয়েছে");
+
+};
+
+loadVIP();
+    users
+ ├── uid
+ │    ├── vip
+ │    ├── balance
+ │    ├── totalEarn
+ │    ├── vipBonusDate
+    <div class="card">
+    <h3>🏆 Achievements</h3>
+
+    <div id="achievementList"></div>
+</div>
+
+<div class="card">
+    <h3>🎯 Reward Points</h3>
+
+    <p>Points: <span id="rewardPoints">0</span></p>
+
+    <button onclick="redeemPoints()">
+        Redeem Points
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎖️ My Badge</h3>
+
+    <p id="badgeName">Beginner</p>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Achievement
+async function loadAchievement(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const data = snap.data();
+
+document.getElementById("rewardPoints").innerHTML =
+data.points || 0;
+
+let badge="🥉 Beginner";
+
+if((data.points||0)>=100)
+badge="🥈 Silver";
+
+if((data.points||0)>=500)
+badge="🥇 Gold";
+
+if((data.points||0)>=1000)
+badge="💎 Diamond";
+
+document.getElementById("badgeName").innerHTML=badge;
+
+let html="";
+
+if((data.totalEarn||0)>=100){
+html+="✅ Earn 100 টাকা<br>";
+}
+
+if((data.totalReferral||0)>=10){
+html+="✅ Invite 10 Friends<br>";
+}
+
+if((data.withdrawCount||0)>=5){
+html+="✅ Withdraw 5 Times";
+}
+
+document.getElementById("achievementList").innerHTML=html;
+
+}
+
+window.redeemPoints = async()=>{
+
+const user=auth.currentUser;
+
+if(!user) return;
+
+const ref=doc(db,"users",user.uid);
+
+const snap=await getDoc(ref);
+
+const points=snap.data().points||0;
+
+if(points<100){
+
+alert("Redeem করার জন্য কমপক্ষে ১০০ Points লাগবে");
+
+return;
+
+}
+
+await updateDoc(ref,{
+
+points:increment(-100),
+
+balance:increment(10)
+
+});
+
+alert("🎉 ১০ টাকা Wallet-এ যোগ হয়েছে");
+
+loadAchievement();
+
+};
+
+loadAchievement();
+    users
+ ├── uid
+ │   ├── points
+ │   ├── totalEarn
+ │   ├── totalReferral
+ │   ├── withdrawCount
+ │   ├── badge
+ │   └── achievements
+    <div class="card">
+    <h3>🌳 Referral Tree</h3>
+
+    <p>Direct Referrals: <span id="directRef">0</span></p>
+
+    <p>Total Team: <span id="teamRef">0</span></p>
+</div>
+
+<div class="card">
+    <h3>📅 Daily Check-in</h3>
+
+    <button onclick="dailyCheckIn()">
+        Check In
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎟 Coupon History</h3>
+
+    <div id="couponHistory"></div>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment,
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Load Referral Info
+async function loadReferralTree(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+const data = snap.data();
+
+document.getElementById("directRef").innerHTML =
+data.totalReferral || 0;
+
+document.getElementById("teamRef").innerHTML =
+data.teamReferral || 0;
+
+}
+
+// Daily Check-in
+window.dailyCheckIn = async()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(doc(db,"users",user.uid),{
+
+balance:increment(2)
+
+});
+
+await addDoc(collection(db,"users",user.uid,"checkins"),{
+
+reward:2,
+
+time:serverTimestamp()
+
+});
+
+alert("✅ Daily Check-in সফল হয়েছে");
+
+};
+
+// Coupon History
+async function loadCouponHistory(){
+
+const user = auth.currentUser;
+
+const snapshot = await getDocs(
+collection(db,"users",user.uid,"coupons")
+);
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+${d.code}<br>
+${d.reward} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("couponHistory").innerHTML = html;
+
+}
+
+loadReferralTree();
+loadCouponHistory();
+    users
+ ├── uid
+ │   ├── totalReferral
+ │   ├── teamReferral
+ │   ├── balance
+ │   ├── checkins
+ │   └── coupons
+    <div class="card">
+    <h3>💸 Wallet Transfer</h3>
+
+    <input type="text" id="receiverUid" placeholder="Receiver UID">
+
+    <input type="number" id="transferAmount" placeholder="Amount">
+
+    <button onclick="transferBalance()">
+        Send Money
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 Gift Card</h3>
+
+    <input type="text" id="giftCode" placeholder="Gift Card Code">
+
+    <button onclick="redeemGiftCard()">
+        Redeem
+    </button>
+</div>
+
+<div class="card">
+    <h3>📄 Transaction Details</h3>
+
+    <div id="transactionList"></div>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment,
+collection,
+addDoc,
+getDocs,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Wallet Transfer (Demo)
+window.transferBalance = async()=>{
+
+const sender = auth.currentUser;
+
+if(!sender) return;
+
+const receiver =
+document.getElementById("receiverUid").value;
+
+const amount =
+Number(document.getElementById("transferAmount").value);
+
+if(amount<=0){
+
+alert("Invalid Amount");
+
+return;
+
+}
+
+// Sender
+await updateDoc(doc(db,"users",sender.uid),{
+balance:increment(-amount)
+});
+
+// Receiver
+await updateDoc(doc(db,"users",receiver),{
+balance:increment(amount)
+});
+
+alert("Transfer Successful");
+
+};
+
+// Gift Card (Demo)
+window.redeemGiftCard = ()=>{
+
+const code =
+document.getElementById("giftCode").value;
+
+if(code=="GIFT100"){
+
+alert("🎁 Gift Card Accepted");
+
+}else{
+
+alert("❌ Invalid Gift Card");
+
+}
+
+};
+
+// Transaction List
+async function loadTransactions(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const snap =
+await getDocs(
+collection(db,"users",user.uid,"transactions")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+${d.type}<br>
+${d.amount} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("transactionList").innerHTML=html;
+
+}
+
+loadTransactions();
+    users
+ ├── uid
+ │   ├── balance
+ │   ├── transactions
+ │   │     ├── type
+ │   │     ├── amount
+ │   │     └── createdAt
+    <div class="card">
+    <h3>📊 Reports</h3>
+
+    <p>Total Income: <span id="totalIncome">0</span></p>
+
+    <p>Total Rewards: <span id="totalRewards">0</span></p>
+
+    <p>Active Users: <span id="activeUsers">0</span></p>
+
+    <button onclick="loadReports()">
+        Refresh
+    </button>
+</div>
+
+<div class="card">
+    <h3>⭐ User Feedback</h3>
+
+    <div id="feedbackList"></div>
+</div>
+
+<div class="card">
+    <h3>🎨 Theme</h3>
+
+    <button onclick="changeTheme('light')">
+        Light
+    </button>
+
+    <button onclick="changeTheme('dark')">
+        Dark
+    </button>
+</div>
+import {
+collection,
+getDocs,
+doc,
+setDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Submit Feedback
+window.submitFeedback = async(text)=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await setDoc(doc(collection(db,"feedback")),{
+
+uid:user.uid,
+
+email:user.email,
+
+message:text,
+
+createdAt:serverTimestamp()
+
+});
+
+alert("ধন্যবাদ! আপনার মতামত জমা হয়েছে।");
+
+};
+
+// Theme
+window.changeTheme=(theme)=>{
+
+document.body.setAttribute("data-theme",theme);
+
+localStorage.setItem("theme",theme);
+
+};
+
+window.onload=()=>{
+
+const theme=
+localStorage.getItem("theme")||"light";
+
+document.body.setAttribute("data-theme",theme);
+
+};
+    async function loadReports(){
+
+const users =
+await getDocs(collection(db,"users"));
+
+document.getElementById("activeUsers").innerHTML =
+users.size;
+
+const feedback =
+await getDocs(collection(db,"feedback"));
+
+let html="";
+
+feedback.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+<b>${d.email}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("feedbackList").innerHTML=html;
+
+}
+
+loadReports();
+    feedback
+ ├── documentId
+ │    ├── uid
+ │    ├── email
+ │    ├── message
+ │    └── createdAt
+    <div class="card">
+    <h3>🎡 Spin Wheel</h3>
+
+    <button onclick="spinWheel()">
+        Spin Now
+    </button>
+
+    <p id="spinResult"></p>
+</div>
+
+<div class="card">
+    <h3>🎫 Scratch Card</h3>
+
+    <button onclick="scratchCard()">
+        Scratch
+    </button>
+
+    <p id="scratchResult"></p>
+</div>
+
+<div class="card">
+    <h3>🍀 Lucky Number</h3>
+
+    <button onclick="luckyNumber()">
+        Try Luck
+    </button>
+
+    <p id="luckyResult"></p>
+</div>
+import {
+doc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Spin Wheel
+window.spinWheel = async()=>{
+
+const rewards=[2,5,10,20,50];
+
+const reward=
+rewards[Math.floor(Math.random()*rewards.length)];
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+balance:increment(reward)
+
+});
+
+document.getElementById("spinResult").innerHTML=
+"🎉 আপনি "+reward+" টাকা জিতেছেন";
+
+};
+
+// Scratch Card
+window.scratchCard = async()=>{
+
+const rewards=[1,3,5,8,15];
+
+const reward=
+rewards[Math.floor(Math.random()*rewards.length)];
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+balance:increment(reward)
+
+});
+
+document.getElementById("scratchResult").innerHTML=
+"🎁 "+reward+" টাকা পেয়েছেন";
+
+};
+
+// Lucky Number
+window.luckyNumber = async()=>{
+
+const lucky=
+Math.floor(Math.random()*100)+1;
+
+let reward=0;
+
+if(lucky>=90){
+
+reward=50;
+
+}else if(lucky>=70){
+
+reward=20;
+
+}else{
+
+reward=5;
+
+}
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+
+balance:increment(reward)
+
+});
+
+document.getElementById("luckyResult").innerHTML=
+"Lucky Number: "+lucky+
+"<br>Reward: "+reward+" টাকা";
+
+};
+    users
+ ├── uid
+ │   ├── balance
+ │   ├── totalEarn
+ │   ├── lastSpin
+ │   ├── lastScratch
+ │   └── lastLucky
+    <div class="card">
+    <h3>🧠 Daily Quiz</h3>
+
+    <p>বাংলাদেশের রাজধানী কী?</p>
+
+    <button onclick="answerQuiz('Dhaka')">ঢাকা</button>
+    <button onclick="answerQuiz('Chittagong')">চট্টগ্রাম</button>
+
+    <p id="quizResult"></p>
+</div>
+
+<div class="card">
+    <h3>📺 Watch Ads Reward</h3>
+
+    <button onclick="watchRewardAd()">
+        Watch Ad
+    </button>
+
+    <p id="adStatus"></p>
+</div>
+
+<div class="card">
+    <h3>ℹ️ App Version</h3>
+
+    <p>Version: <span id="appVersion">1.0.0</span></p>
+</div>
+import {
+doc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Quiz
+window.answerQuiz = async(answer)=>{
+
+if(answer==="Dhaka"){
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(5)
+}
+);
+
+document.getElementById("quizResult").innerHTML =
+"✅ সঠিক উত্তর! +৫ টাকা";
+
+}else{
+
+document.getElementById("quizResult").innerHTML =
+"❌ ভুল উত্তর";
+
+}
+
+};
+
+// Reward Ad (Demo)
+window.watchRewardAd = async()=>{
+
+document.getElementById("adStatus").innerHTML =
+"Ad Finished";
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(3)
+}
+);
+
+document.getElementById("adStatus").innerHTML =
+"🎉 +৩ টাকা যোগ হয়েছে";
+
+};
+    users
+ ├── uid
+ │   ├── balance
+ │   ├── lastQuiz
+ │   ├── lastRewardAd
+ │   └── totalEarn
+    <div class="card">
+    <h3>🔥 Daily Challenge</h3>
+
+    <button onclick="completeChallenge()">
+        Complete Challenge
+    </button>
+
+    <p id="challengeStatus"></p>
+</div>
+
+<div class="card">
+    <h3>🎡 Spin History</h3>
+
+    <div id="spinHistory"></div>
+</div>
+
+<div class="card">
+    <h3>💸 Redeem Request</h3>
+
+    <input
+        type="number"
+        id="redeemAmount"
+        placeholder="Amount">
+
+    <button onclick="requestRedeem()">
+        Redeem
+    </button>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+doc,
+updateDoc,
+increment,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Challenge
+window.completeChallenge = async()=>{
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(8)
+}
+);
+
+document.getElementById("challengeStatus").innerHTML =
+"✅ Challenge Complete (+8 টাকা)";
+
+};
+
+// Redeem Request
+window.requestRedeem = async()=>{
+
+const amount = Number(
+document.getElementById("redeemAmount").value
+);
+
+await addDoc(
+collection(db,"redeemRequests"),
+{
+
+uid:auth.currentUser.uid,
+
+amount:amount,
+
+status:"Pending",
+
+createdAt:serverTimestamp()
+
+});
+
+alert("Redeem Request Submitted");
+
+};
+
+// Spin History
+async function loadSpinHistory(){
+
+const snap =
+await getDocs(
+collection(db,"users",auth.currentUser.uid,"spins")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+${d.reward} টাকা<br>
+${d.date}
+</div>
+`;
+
+});
+
+document.getElementById("spinHistory").innerHTML=html;
+
+}
+
+loadSpinHistory();
+    redeemRequests
+ ├── documentId
+ │   ├── uid
+ │   ├── amount
+ │   ├── status
+ │   └── createdAt
+
+users
+ ├── uid
+ │   └── spins
+ │       ├── reward
+ │       └── date
+    <div class="card">
+    <h3>👥 Referral Commission</h3>
+    <div id="commissionHistory"></div>
+</div>
+
+<div class="card">
+    <h3>💸 Withdrawal Tracker</h3>
+    <div id="withdrawTracker"></div>
+</div>
+
+<div class="card">
+    <h3>📅 Activity Timeline</h3>
+    <div id="activityTimeline"></div>
+</div>
+import {
+collection,
+query,
+where,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Referral Commission
+async function loadCommissionHistory(){
+
+const q=query(
+collection(db,"referralIncome"),
+where("uid","==",auth.currentUser.uid)
+);
+
+const snap=await getDocs(q);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`
+<div class="card">
++${d.amount} টাকা<br>
+${d.date}
+</div>
+`;
+
+});
+
+document.getElementById("commissionHistory").innerHTML=html;
+
+}
+
+// Withdraw Status
+async function loadWithdrawTracker(){
+
+const q=query(
+collection(db,"withdraws"),
+where("uid","==",auth.currentUser.uid)
+);
+
+const snap=await getDocs(q);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`
+<div class="card">
+${d.amount} টাকা<br>
+Status : ${d.status}
+</div>
+`;
+
+});
+
+document.getElementById("withdrawTracker").innerHTML=html;
+
+}
+
+// Activity Timeline
+async function loadActivityTimeline(){
+
+const q=query(
+collection(db,"activityLogs"),
+where("uid","==",auth.currentUser.uid)
+);
+
+const snap=await getDocs(q);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`
+<div class="card">
+${d.action}<br>
+${d.time || ""}
+</div>
+`;
+
+});
+
+document.getElementById("activityTimeline").innerHTML=html;
+
+}
+
+loadCommissionHistory();
+loadWithdrawTracker();
+loadActivityTimeline();
+    referralIncome
+ ├── documentId
+ │   ├── uid
+ │   ├── amount
+ │   ├── date
+
+activityLogs
+ ├── documentId
+ │   ├── uid
+ │   ├── action
+ │   ├── time
+    <div class="card">
+    <h3>🏆 Referral Contest</h3>
+
+    <p>My Referrals: <span id="contestReferral">0</span></p>
+
+    <p>My Rank: <span id="contestRank">--</span></p>
+</div>
+
+<div class="card">
+    <h3>📅 Daily Attendance</h3>
+
+    <button onclick="markAttendance()">
+        Check In
+    </button>
+
+    <p id="attendanceStatus"></p>
+</div>
+
+<div class="card">
+    <h3>📄 Wallet Statement</h3>
+
+    <div id="walletStatement"></div>
+</div>
+import {
+collection,
+query,
+orderBy,
+getDocs,
+doc,
+updateDoc,
+increment,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Attendance
+window.markAttendance = async()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await updateDoc(
+doc(db,"users",user.uid),
+{
+balance:increment(2)
+}
+);
+
+await addDoc(
+collection(db,"users",user.uid,"attendance"),
+{
+reward:2,
+createdAt:serverTimestamp()
+}
+);
+
+document.getElementById("attendanceStatus").innerHTML =
+"✅ Attendance Completed (+2 টাকা)";
+
+};
+
+// Contest Leaderboard
+async function loadContest(){
+
+const q=query(
+collection(db,"users"),
+orderBy("totalReferral","desc")
+);
+
+const snap=await getDocs(q);
+
+let rank=1;
+
+snap.forEach(doc=>{
+
+if(doc.id===auth.currentUser.uid){
+
+document.getElementById("contestRank").innerHTML=rank;
+
+document.getElementById("contestReferral").innerHTML=
+doc.data().totalReferral||0;
+
+}
+
+rank++;
+
+});
+
+}
+
+// Wallet Statement
+async function loadStatement(){
+
+const snap=await getDocs(
+collection(db,"users",auth.currentUser.uid,"transactions")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`
+<div class="card">
+${d.type}<br>
+${d.amount} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("walletStatement").innerHTML=html;
+
+}
+
+loadContest();
+loadStatement();
+    users
+ ├── uid
+ │   ├── attendance
+ │   │    ├── reward
+ │   │    └── createdAt
+ │   ├── transactions
+ │   ├── totalReferral
+ │   └── balance
+
+    <div class="card">
+    <h3>🔥 Daily Spin Streak</h3>
+
+    <p>Current Streak:
+        <span id="spinStreak">0</span> Days
+    </p>
+
+    <button onclick="claimSpinStreak()">
+        Claim Today's Spin
+    </button>
+</div>
+
+<div class="card">
+    <h3>🏅 Achievement Reward</h3>
+
+    <button onclick="claimAchievementReward()">
+        Claim Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>📊 My Statistics</h3>
+
+    <p>Total Tasks: <span id="totalTasks">0</span></p>
+
+    <p>Total Spins: <span id="totalSpins">0</span></p>
+
+    <p>Total Login: <span id="totalLogin">0</span></p>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Daily Spin Streak
+window.claimSpinStreak = async()=>{
+
+const ref = doc(db,"users",auth.currentUser.uid);
+
+await updateDoc(ref,{
+spinStreak:increment(1),
+balance:increment(3),
+totalSpins:increment(1)
+});
+
+alert("🎉 Spin Streak Reward +3 টাকা");
+
+loadProfileStats();
+
+};
+
+// Achievement Reward
+window.claimAchievementReward = async()=>{
+
+const ref = doc(db,"users",auth.currentUser.uid);
+
+const snap = await getDoc(ref);
+
+const data = snap.data();
+
+if((data.totalTasks||0)<20){
+
+alert("২০টি Task সম্পূর্ণ করুন");
+
+return;
+
+}
+
+await updateDoc(ref,{
+balance:increment(20)
+});
+
+alert("🏆 Achievement Reward +20 টাকা");
+
+};
+
+// Statistics
+async function loadProfileStats(){
+
+const snap =
+await getDoc(doc(db,"users",auth.currentUser.uid));
+
+const data = snap.data();
+
+document.getElementById("spinStreak").innerHTML =
+data.spinStreak || 0;
+
+document.getElementById("totalTasks").innerHTML =
+data.totalTasks || 0;
+
+document.getElementById("totalSpins").innerHTML =
+data.totalSpins || 0;
+
+document.getElementById("totalLogin").innerHTML =
+data.totalLogin || 0;
+
+}
+
+loadProfileStats();
+    users
+ ├── uid
+ │   ├── spinStreak
+ │   ├── totalTasks
+ │   ├── totalSpins
+ │   ├── totalLogin
+ │   ├── balance
+ │   └── achievements
+    <div class="card">
+    <h3>🏆 Monthly Reward</h3>
+
+    <p>Monthly Income:
+        <span id="monthlyIncome">0</span> টাকা
+    </p>
+
+    <button onclick="claimMonthlyReward()">
+        Claim Monthly Reward
+    </button>
+</div>
+
+<div class="card">
+    <h3>🌍 Global Ranking</h3>
+
+    <p>Rank:
+        <span id="globalRank">--</span>
+    </p>
+</div>
+
+<div class="card">
+    <h3>🧾 Last Withdraw Receipt</h3>
+
+    <div id="withdrawReceipt">
+        No Receipt
+    </div>
+</div>
+import {
+doc,
+getDoc,
+updateDoc,
+increment,
+collection,
+query,
+orderBy,
+getDocs,
+limit
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Monthly Reward
+window.claimMonthlyReward = async()=>{
+
+const ref = doc(db,"users",auth.currentUser.uid);
+
+const snap = await getDoc(ref);
+
+const income = snap.data().monthlyIncome || 0;
+
+if(income < 1000){
+
+alert("কমপক্ষে ১০০০ টাকা Monthly Income লাগবে");
+
+return;
+
+}
+
+await updateDoc(ref,{
+
+balance:increment(100)
+
+});
+
+alert("🎉 Monthly Reward +100 টাকা");
+
+};
+
+// Global Rank
+async function loadRank(){
+
+const q = query(
+
+collection(db,"users"),
+
+orderBy("totalEarn","desc"),
+
+limit(100)
+
+);
+
+const snap = await getDocs(q);
+
+let rank = 1;
+
+snap.forEach(doc=>{
+
+if(doc.id==auth.currentUser.uid){
+
+document.getElementById("globalRank").innerHTML =
+"#"+rank;
+
+}
+
+rank++;
+
+});
+
+}
+
+// Withdraw Receipt
+async function loadReceipt(){
+
+const snap = await getDoc(
+doc(db,"users",auth.currentUser.uid)
+);
+
+const data = snap.data();
+
+document.getElementById("monthlyIncome").innerHTML =
+data.monthlyIncome || 0;
+
+document.getElementById("withdrawReceipt").innerHTML =
+
+`
+Amount : ${data.lastWithdraw || 0} টাকা<br>
+Method : ${data.lastMethod || "-"}<br>
+Status : ${data.lastStatus || "Pending"}
+`;
+
+}
+
+loadRank();
+
+loadReceipt();
+    users
+ ├── uid
+ │   ├── monthlyIncome
+ │   ├── lastWithdraw
+ │   ├── lastMethod
+ │   ├── lastStatus
+ │   ├── totalEarn
+ │   └── balance
+    <div class="card">
+    <h3>🎟️ Promo Code</h3>
+
+    <input
+        type="text"
+        id="promoCode"
+        placeholder="Enter Promo Code">
+
+    <button onclick="redeemPromoCode()">
+        Redeem
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 My Coupons</h3>
+
+    <div id="couponList"></div>
+</div>
+
+<div class="card">
+    <h3>🔔 Notification Center</h3>
+
+    <div id="notificationCenter"></div>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc,
+increment
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Promo Code (Demo)
+window.redeemPromoCode = async()=>{
+
+const code =
+document.getElementById("promoCode").value.trim();
+
+if(code==="WELCOME100"){
+
+await updateDoc(
+doc(db,"users",auth.currentUser.uid),
+{
+balance:increment(100)
+}
+);
+
+alert("🎉 Promo Code সফল! +100 টাকা");
+
+}else{
+
+alert("❌ Invalid Promo Code");
+
+}
+
+};
+
+// Load Coupons
+async function loadCoupons(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"coupons")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+🎟️ ${d.code}<br>
+Reward: ${d.reward} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("couponList").innerHTML = html;
+
+}
+
+// Notification Center
+async function loadNotifications(){
+
+const snap = await getDocs(
+collection(db,"notifications")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+html += `
+<div class="card">
+<b>${d.title}</b><br>
+${d.message}
+</div>
+`;
+
+});
+
+document.getElementById("notificationCenter").innerHTML = html;
+
+}
+
+loadCoupons();
+loadNotifications();
+    users
+ ├── uid
+ │   ├── balance
+ │   ├── coupons
+ │   │    ├── code
+ │   │    ├── reward
+ │   │    └── usedAt
+
+notifications
+ ├── documentId
+ │   ├── title
+ │   ├── message
+ │   └── createdAt
+    <div class="card">
+    <h3>💸 Wallet Transfer</h3>
+
+    <input type="text" id="receiverUid" placeholder="Receiver UID">
+
+    <input type="number" id="transferAmount" placeholder="Amount">
+
+    <button onclick="transferBalance()">
+        Send Money
+    </button>
+</div>
+
+<div class="card">
+    <h3>🎁 Gift Card</h3>
+
+    <input type="text" id="giftCode" placeholder="Gift Card Code">
+
+    <button onclick="redeemGiftCard()">
+        Redeem
+    </button>
+</div>
+
+<div class="card">
+    <h3>📄 Transaction Details</h3>
+
+    <div id="transactionList"></div>
+</div>
+import {
+doc,
+updateDoc,
+increment,
+collection,
+getDocs,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Wallet Transfer (Demo)
+window.transferBalance = async () => {
+
+const sender = auth.currentUser;
+if (!sender) return;
+
+const receiverUid = document.getElementById("receiverUid").value.trim();
+const amount = Number(document.getElementById("transferAmount").value);
+
+if (!receiverUid || amount <= 0) {
+    alert("সঠিক তথ্য দিন");
+    return;
+}
+
+await updateDoc(doc(db,"users",sender.uid),{
+    balance: increment(-amount)
+});
+
+await updateDoc(doc(db,"users",receiverUid),{
+    balance: increment(amount)
+});
+
+await addDoc(collection(db,"users",sender.uid,"transactions"),{
+    type:"Transfer",
+    amount:amount,
+    createdAt:serverTimestamp()
+});
+
+alert("✅ Transfer সফল হয়েছে");
+
+};
+
+// Gift Card (Demo)
+window.redeemGiftCard = async()=>{
+
+const code = document.getElementById("giftCode").value;
+
+if(code==="GIFT100"){
+
+await updateDoc(doc(db,"users",auth.currentUser.uid),{
+balance:increment(100)
+});
+
+alert("🎉 Gift Card Redeemed");
+
+}else{
+
+alert("❌ Invalid Gift Card");
+
+}
+
+};
+
+// Transaction List
+async function loadTransactions(){
+
+const snap = await getDocs(
+collection(db,"users",auth.currentUser.uid,"transactions")
+);
+
+let html="";
+
+snap.forEach(item=>{
+
+const d=item.data();
+
+html += `
+<div class="card">
+<b>${d.type}</b><br>
+Amount: ${d.amount} টাকা
+</div>
+`;
+
+});
+
+document.getElementById("transactionList").innerHTML=html;
+
+}
+
+loadTransactions();
+    users
+ ├── uid
+ │   ├── balance
+ │   └── transactions
+ │       ├── type
+ │       ├── amount
+ │       └── createdAt
+    <div class="card">
+    <h3>🎫 Support Ticket</h3>
+
+    <textarea id="ticketMessage"
+        placeholder="আপনার সমস্যাটি লিখুন"></textarea>
+
+    <button onclick="submitTicket()">
+        Submit Ticket
+    </button>
+</div>
+
+<div class="card">
+    <h3>🛠 Maintenance Status</h3>
+
+    <p id="maintenanceStatus">
+        ✅ System Online
+    </p>
+</div>
+
+<div class="card">
+    <h3>📱 Login Devices</h3>
+
+    <div id="deviceList"></div>
+</div>
+import {
+collection,
+addDoc,
+getDocs,
+doc,
+getDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Submit Support Ticket
+window.submitTicket = async()=>{
+
+const message =
+document.getElementById("ticketMessage").value.trim();
+
+if(message===""){
+
+alert("সমস্যা লিখুন");
+
+return;
+
+}
+
+await addDoc(collection(db,"supportTickets"),{
+
+uid:auth.currentUser.uid,
+
+message:message,
+
+status:"Open",
+
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Support Ticket Submitted");
+
+};
+
+// Maintenance Status
+async function loadMaintenance(){
+
+const snap =
+await getDoc(doc(db,"settings","maintenance"));
+
+if(snap.exists()){
+
+const data=snap.data();
+
+document.getElementById("maintenanceStatus").innerHTML =
+data.enabled
+? "🛠 Maintenance Mode"
+: "✅ System Online";
+
+}
+
+}
+
+// Login Devices
+async function loadDevices(){
+
+const snap =
+await getDocs(
+collection(db,"users",auth.currentUser.uid,"devices")
+);
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+📱 ${d.deviceName}<br>
+Last Login: ${d.lastLogin}
+</div>
+`;
+
+});
+
+document.getElementById("deviceList").innerHTML=html;
+
+}
+
+loadMaintenance();
+loadDevices();
+    supportTickets
+ ├── documentId
+ │   ├── uid
+ │   ├── message
+ │   ├── status
+ │   └── createdAt
+
+settings
+ └── maintenance
+      ├── enabled
+
+users
+ └── uid
+      └── devices
+           ├── deviceName
+           └── lastLogi
+    <div class="card">
+    <h3>📊 Dashboard Analytics</h3>
+
+    <p>Total Users: <span id="totalUsers">0</span></p>
+
+    <p>Total Withdraws: <span id="totalWithdraws">0</span></p>
+
+    <p>Total Rewards: <span id="totalRewards">0</span></p>
+
+    <button onclick="loadAnalytics()">
+        Refresh
+    </button>
+</div>
+
+<div class="card">
+    <h3>✅ User Verification</h3>
+
+    <input type="text"
+           id="verifyUid"
+           placeholder="User UID">
+
+    <button onclick="verifyUser()">
+        Verify User
+    </button>
+</div>
+
+<div class="card">
+    <h3>📢 Push Notification</h3>
+
+    <input type="text"
+           id="pushTitle"
+           placeholder="Title">
+
+    <textarea id="pushMessage"
+              placeholder="Message"></textarea>
+
+    <button onclick="sendPushNotification()">
+        Send
+    </button>
+</div>
+import {
+collection,
+getDocs,
+doc,
+updateDoc,
+setDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Dashboard Analytics
+window.loadAnalytics = async()=>{
+
+const users =
+await getDocs(collection(db,"users"));
+
+document.getElementById("totalUsers").innerHTML =
+users.size;
+
+const withdraws =
+await getDocs(collection(db,"withdraws"));
+
+document.getElementById("totalWithdraws").innerHTML =
+withdraws.size;
+
+const rewards =
+await getDocs(collection(db,"rewardHistory"));
+
+document.getElementById("totalRewards").innerHTML =
+rewards.size;
+
+};
+
+// User Verify
+window.verifyUser = async()=>{
+
+const uid =
+document.getElementById("verifyUid").value;
+
+if(!uid) return;
+
+await updateDoc(doc(db,"users",uid),{
+
+verified:true
+
+});
+
+alert("✅ User Verified");
+
+};
+
+// Push Notification (Demo)
+window.sendPushNotification = async()=>{
+
+const title =
+document.getElementById("pushTitle").value;
+
+const message =
+document.getElementById("pushMessage").value;
+
+await setDoc(
+doc(collection(db,"notifications")),
+{
+
+title,
+
+message,
+
+createdAt:serverTimestamp()
+
+});
+
+alert("📢 Notification Sent");
+
+};
+
+loadAnalytics();
+    users
+ ├── uid
+ │   ├── verified
+
+notifications
+ ├── documentId
+ │   ├── title
+ │   ├── message
+ │   └── createdAt
+
+rewardHistory
+ ├── documentId
+ │   ├── uid
+ │   ├── amount
+ │   └── createdAt
+    <div class="card">
+    <h3>💰 Earnings Report</h3>
+
+    <p>Total Earnings:
+        <span id="totalEarnings">0</span>
+    </p>
+
+    <button onclick="loadEarningsReport()">
+        Refresh
+    </button>
+</div>
+
+<div class="card">
+    <h3>📋 User Login Logs</h3>
+
+    <div id="loginLogs"></div>
+</div>
+
+<div class="card">
+    <h3>📢 App Update Notice</h3>
+
+    <input type="text"
+           id="updateTitle"
+           placeholder="Update Title">
+
+    <textarea id="updateMessage"
+              placeholder="Update Details"></textarea>
+
+    <button onclick="publishUpdate()">
+        Publish
+    </button>
+</div>
+import {
+collection,
+getDocs,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Earnings Report
+window.loadEarningsReport = async()=>{
+
+const rewards =
+await getDocs(collection(db,"rewardHistory"));
+
+let total = 0;
+
+rewards.forEach(item=>{
+
+total += item.data().amount || 0;
+
+});
+
+document.getElementById("totalEarnings").innerHTML =
+total;
+
+};
+
+// Login Logs
+async function loadLoginLogs(){
+
+const logs =
+await getDocs(collection(db,"loginHistory"));
+
+let html="";
+
+logs.forEach(item=>{
+
+const d=item.data();
+
+html += `
+<div class="card">
+${d.email}<br>
+${d.loginTime || ""}
+</div>
+`;
+
+});
+
+document.getElementById("loginLogs").innerHTML =
+html;
+
+}
+
+// Publish Update Notice
+window.publishUpdate = async()=>{
+
+const title =
+document.getElementById("updateTitle").value;
+
+const message =
+document.getElementById("updateMessage").value;
+
+await addDoc(collection(db,"updates"),{
+
+title,
+message,
+createdAt:serverTimestamp()
+
+});
+
+alert("✅ Update Published");
+
+};
+
+loadEarningsReport();
+loadLoginLogs();
+    import {
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+async function loadAppUpdates(){
+
+const snap =
+await getDocs(collection(db,"updates"));
+
+let html="";
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+html += `
+<div class="card">
+<h4>${d.title}</h4>
+<p>${d.message}</p>
+</div>
+`;
+
+});
+
+document.getElementById("updateContainer").innerHTML =
+html;
+
+}
+
+loadAppUpdates();
+    updates
+ ├── documentId
+ │   ├── title
+ │   ├── message
+ │   └── createdAt
+
+loginHistory
+ ├── documentId
+ │   ├── uid
+ │   ├── email
+ │   ├── loginTime
+
+rewardHistory
+ ├── documentId
+ │   ├── uid
+ │   ├── amount
+ │   └── createdAt
